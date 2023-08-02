@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "target": "ES2015",
+        "target": "ES6",
         "useDefineForClassFields": true,
         "lib": ["DOM", "DOM.Iterable", "ESNext"],
         "allowJs": false,
@@ -13,9 +13,12 @@
         "moduleResolution": "Node",
         "resolveJsonModule": true,
         "isolatedModules": true,
-        "noEmit": true,
+        "noEmit": false,
         "jsx": "react-jsx",
-        "baseUrl": "."
+        "baseUrl": ".",
+        "paths": {
+            "react": ["./node_modules/@types/react"]
+        }
     },
     "include": ["src"],
     "references": [{ "path": "./tsconfig.node.json" }]

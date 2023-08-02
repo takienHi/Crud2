@@ -1,25 +1,27 @@
-import { useState } from 'react';
-import './App.css';
+import useRouteElements from './useRouteElements';
+import ThemeProvider from './theme/ThemeProvider';
+// import AdapterDateFns from '@mui/lab/AdapterDateFns';
+import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
+// import LocalizationProvider from '@mui/lab/LocalizationProvider';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { CssBaseline } from '@mui/material';
+
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { SnackbarProvider } from 'notistack';
 
 function App() {
-    const [count, setCount] = useState(0);
-
+    const routeElements = useRouteElements();
     return (
-        <div className='App'>
-            <div>
-                <a href='https://vitejs.dev ' target='_blank' rel='noreferrer'>
-                    <img src='/vite.svg' className='logo' alt='Vite logo' />
-                </a>
-            </div>
-            <h1>Vite + React</h1>
-            <div className='card'>
-                <button onClick={() => setCount((count) => count + 1)}>count is {count}</button>
-                <p>
-                    Edit <code>src/App.tsx</code> and save to test HMR
-                </p>
-            </div>
-            <p className='read-the-docs'>Click on the Vite and React logos to learn more</p>
-        </div>
+        <>
+            <ThemeProvider>
+                <LocalizationProvider dateAdapter={AdapterDateFns}>
+                    <CssBaseline />
+                    <SnackbarProvider>{routeElements}</SnackbarProvider>
+                    <ToastContainer />
+                </LocalizationProvider>
+            </ThemeProvider>
+        </>
     );
 }
 

@@ -1,109 +1,289 @@
 {
-  "products": [
+  "users": [
     {
       "id": 1,
-      "title": "Product 1",
-      "category": "electronics",
-      "price": 4000,
-      "description": "This is description about product 1"
+      "fullName": "Tạ Phong Kiên",
+      "userName": "admin",
+      "email": "admin@admin",
+      "role": "admin",
+      "password": "123456",
+      "status": "active"
     },
     {
       "id": 2,
-      "title": "Product 2",
-      "category": "electronics",
-      "price": 2000,
-      "description": "This is description about product 2"
+      "fullName": "Tạ Phong Kiên",
+      "userName": "manager",
+      "email": "manager@gmail.com",
+      "role": "manager",
+      "password": "123456",
+      "status": "active"
     },
     {
       "id": 3,
-      "title": "Product 3",
-      "category": "books",
-      "price": 1000,
-      "description": "This is description about product 3"
+      "fullName": "employee",
+      "userName": "employee1",
+      "email": "employee1@gmail.com",
+      "role": "employee",
+      "password": "123456",
+      "status": "active"
     },
     {
       "id": 4,
-      "title": "Product 4",
-      "category": "fitness",
-      "price": 3000,
-      "description": "This is description about product 4"
+      "fullName": "alexcys",
+      "userName": "alexcy",
+      "email": "alexcy@gg.com",
+      "role": "employee",
+      "password": "",
+      "status": "active",
+      "username": "alexcy"
     },
     {
       "id": 5,
-      "title": "Product 5",
-      "category": "fitness",
-      "price": 4000,
-      "description": "This is description about product 5"
+      "fullName": "employee22",
+      "userName": "employee2",
+      "email": "employee2@gmail.com",
+      "role": "employee",
+      "password": "123456",
+      "status": "active"
     },
     {
       "id": 6,
-      "title": "Product 6",
-      "category": "gardening",
-      "price": 5000,
-      "description": "This is description about product 6"
+      "fullName": "employee3",
+      "userName": "employee3",
+      "email": "employee3@gmail.com",
+      "role": "employee",
+      "password": "123456",
+      "status": "active"
     },
     {
       "id": 7,
-      "title": "Product 7",
-      "category": "furniture",
-      "price": 6000,
-      "description": "This is description about product 7"
+      "fullName": "1",
+      "userName": "1",
+      "email": "1",
+      "role": "",
+      "password": "1",
+      "status": "active"
     },
     {
       "id": 8,
-      "title": "Product 8",
-      "category": "furniture",
-      "price": 7000,
-      "description": "This is description about product 8"
+      "fullName": "User2",
+      "userName": "o",
+      "email": "o",
+      "role": "manager",
+      "password": "0",
+      "status": "active"
     },
     {
       "id": 9,
-      "title": "Product 9",
-      "category": "accessories",
-      "price": 4000,
-      "description": "This is description about product 9"
+      "fullName": "9",
+      "userName": "9",
+      "email": "9",
+      "role": "employee",
+      "password": "9",
+      "status": "disabled"
     },
     {
-      "id": 10,
-      "title": "Product 10",
-      "category": "electronics",
-      "price": 3000,
-      "description": "This is description about product 10",
-      "discount": {
-        "type": "shipping"
-      }
+      "fullName": "Tạ Phong Kiên",
+      "userName": "manager2",
+      "email": "manager2@gmail.com",
+      "password": "123456",
+      "passwordConfirm": "123456",
+      "role": "employee",
+      "status": "active",
+      "id": 10
+    },
+    {
+      "fullName": "Tạ Phong Kiên",
+      "role": "manager",
+      "userName": "admin2",
+      "email": "takien2@gmail.com2",
+      "password": "123456",
+      "passwordConfirm": "123456",
+      "status": "active",
+      "id": 11
+    },
+    {
+      "fullName": "Tạ Phong Kiên",
+      "role": "manager",
+      "userName": "manager5",
+      "email": "manager5@gmail.com",
+      "password": "123456",
+      "passwordConfirm": "123456",
+      "status": "active",
+      "id": 12
+    },
+    {
+      "fullName": "Tạ Phong Kiên2",
+      "role": "manager",
+      "userName": "employee5",
+      "email": "employee5@gmail.com",
+      "password": "654321",
+      "passwordConfirm": "123456",
+      "status": "disabled",
+      "id": 13
     }
   ],
-  "reviews": [
-    {
-      "id": 1,
-      "rating": 3,
-      "comment": "Review 1 for product id 1",
-      "productId": 1
-    },
+  "tasks": [
     {
       "id": 2,
-      "rating": 4,
-      "comment": "Review 2 for product id 1",
-      "productId": 1
-    },
-    {
-      "id": 3,
-      "rating": 4,
-      "comment": "Review 3 for product id 1",
-      "productId": 1
+      "title": "Task 2",
+      "description": "This is description about task 2",
+      "status": "completed",
+      "userId": 1
     },
     {
       "id": 4,
-      "rating": 5,
-      "comment": "Review 1 for product id 2",
-      "productId": 2
+      "title": "Task 4",
+      "description": "This is description about task 4",
+      "status": "incomplete",
+      "userId": 1
     },
     {
       "id": 5,
-      "rating": 3,
-      "comment": "Review 1 for product id 3",
-      "productId": 3
+      "title": "Task 5",
+      "description": "This is description about task 5",
+      "status": "completed",
+      "userId": 1
+    },
+    {
+      "id": 6,
+      "title": "Task 6",
+      "description": "This is description about task 6",
+      "status": "completed",
+      "userId": 1
+    },
+    {
+      "id": 7,
+      "title": "Task 7",
+      "description": "This is description about task 72",
+      "status": "completed",
+      "userId": 3
+    },
+    {
+      "id": 8,
+      "title": "Task 8",
+      "description": "This is description about task 8",
+      "status": "completed",
+      "userId": 1
+    },
+    {
+      "id": 11,
+      "title": "Host a comedy show for your family",
+      "description": "Host a comedy show for your family",
+      "status": "incomplete",
+      "userId": 5
+    },
+    {
+      "id": 12,
+      "title": "Write to a key worker thanking them for their contribution",
+      "description": "Write to ra",
+      "status": "completed",
+      "userId": 5
+    },
+    {
+      "id": 13,
+      "title": "edit video",
+      "description": "edit video youtube and tiktok",
+      "status": "completed",
+      "userId": 5
+    },
+    {
+      "id": 15,
+      "title": "work",
+      "description": " edit video",
+      "status": "incomplete",
+      "userId": 6
+    },
+    {
+      "id": 16,
+      "title": "FormData",
+      "description": "FormDatahow for your familyHost a comedy show for you",
+      "status": "completed",
+      "userId": 3
+    },
+    {
+      "id": 17,
+      "title": "ooooooo",
+      "description": "oooooo",
+      "status": "incomplete",
+      "userId": 8
+    },
+    {
+      "id": 18,
+      "title": "trtrtrtrrtrtrt",
+      "description": "dd",
+      "status": "incomplete",
+      "userId": 8
+    },
+    {
+      "id": 19,
+      "title": "",
+      "description": "",
+      "status": "incomplete",
+      "userId": 3
+    },
+    {
+      "id": 20,
+      "title": "",
+      "description": "",
+      "status": "incomplete",
+      "userId": 3
+    },
+    {
+      "id": 21,
+      "title": "",
+      "description": "",
+      "status": "incomplete",
+      "userId": 3
+    },
+    {
+      "id": 22,
+      "title": "",
+      "description": "",
+      "status": "incomplete",
+      "userId": 3
+    },
+    {
+      "id": 23,
+      "title": "",
+      "description": "",
+      "status": "incomplete",
+      "userId": 3
+    },
+    {
+      "id": 24,
+      "title": "m",
+      "description": "",
+      "status": "incomplete",
+      "userId": 3
+    },
+    {
+      "id": 25,
+      "title": "",
+      "description": "",
+      "status": "incomplete",
+      "userId": 3
+    },
+    {
+      "id": 26,
+      "title": "",
+      "description": "",
+      "status": "incomplete",
+      "userId": 3
+    },
+    {
+      "id": 27,
+      "title": "",
+      "description": "",
+      "status": "incomplete",
+      "userId": 3
+    },
+    {
+      "id": 28,
+      "title": "aqwedededededededededed",
+      "description": "adsssssssssssssss",
+      "status": "incomplete",
+      "userId": 10
     }
   ]
 }

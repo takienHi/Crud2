@@ -138,7 +138,7 @@ server.use((req, res, next) => {
   `http://localhost:8000/api/products/?_sort=price`
   [http://localhost:8000/api/products/?\_sort=price](http://localhost:8000/api/products/?_sort=price)
 
-- Khi thêm thuộc tính `?_sort={property}&_order=(asc & desc)`
+- Khi thêm thuộc tính `?_sort={property}&_order=(asc or desc)`
   ví dụ xắp xếp theo Price giảm dần :
   `http://localhost:8000/api/products/?_sort=price&_order=desc`
   [http://localhost:8000/api/products/?\_sort=price&\_order=desc](http://localhost:8000/api/products/?_sort=price&_order=desc)
