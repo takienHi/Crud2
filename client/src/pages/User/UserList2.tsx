@@ -1,13 +1,8 @@
-import { FC, ChangeEvent, useState, useEffect, useContext, useMemo } from 'react';
+import { FC, ChangeEvent, useState, useEffect, useContext } from 'react';
 import PropTypes from 'prop-types';
 import {
-    // Autocomplete,
-    Tooltip,
     Box,
-    FormControl,
-    InputLabel,
     Card,
-    IconButton,
     Table,
     TableBody,
     TableCell,
@@ -15,27 +10,13 @@ import {
     TablePagination,
     TableRow,
     TableContainer,
-    Select,
-    MenuItem,
-    Typography,
-    useTheme,
     Grid,
-    TextField,
-    InputAdornment,
     Button,
-    Dialog,
-    DialogTitle,
     DialogActions,
-    DialogContent,
-    ToggleButtonGroup,
-    ToggleButton
+    DialogContent
 } from '@mui/material';
 
 import Label from 'src/components/Label';
-import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
-import SearchTwoToneIcon from '@mui/icons-material/SearchTwoTone';
-import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
-import CloseIcon from '@mui/icons-material/Close';
 
 import { UserType, UserStatusType } from 'src/types/UserType';
 import UserApi from 'src/apis/user.api';
@@ -48,6 +29,13 @@ import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import { EditUserSchema, PasswordFormSchema, editUserSchema, passwordFormSchema } from 'src/schema/userSchema';
 import MuiReadOnlyTextField from 'src/components/MuiReadOnlyTextField';
+import StatusToggleButton from 'src/components/StatusToggleButton';
+import TableFilterUser from '../components/TableFilter/TableFilterUser';
+
+import TableActions from '../components/TableActions';
+import TableTypography from 'src/components/TableTypography';
+import MuiAutocomplete from 'src/components/MuiAutocomplete/MuiAutocomplete';
+import { getRoles } from 'src/data/roles';
 
 interface RecentOrdersTableProps {
     className?: string;
@@ -77,6 +65,21 @@ const statusOptions = [
     }
 ];
 
+const roleOptions = [
+    {
+        id: 'all',
+        name: 'All'
+    },
+    {
+        id: 'manager',
+        name: 'Manager'
+    },
+    {
+        id: 'employee',
+        name: 'Employee'
+    }
+];
+
 const getStatusLabel = (userStatus: UserStatusType): JSX.Element => {
     const map = {
         disabled: {
@@ -94,6 +97,17 @@ const getStatusLabel = (userStatus: UserStatusType): JSX.Element => {
     return <Label color={color}>{text}</Label>;
 };
 
+const statusValues = [
+    {
+        title: 'Active',
+        value: 'active'
+    },
+    {
+        title: 'Disabled',
+        value: 'disabled'
+    }
+];
+
 const filterString = (filters: Filters): string => {
     let filterStr = '';
 
@@ -103,6 +117,10 @@ const filterString = (filters: Filters): string => {
 
     if (filters.status && filters.status !== 'all') {
         filterStr = filterStr + 'status=' + filters.status + '&';
+    }
+
+    if (filters.role && filters.role !== 'all') {
+        filterStr = filterStr + 'role=' + filters.role + '&';
     }
 
     return filterStr;
@@ -118,9 +136,9 @@ const UserList2: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged,
     const [page, setPage] = useState<number>(0);
     const [limit, setLimit] = useState<number>(10);
     const [filters, setFilters] = useState({
+        role: null,
         status: null,
-        searchStr: '',
-        role: null
+        searchStr: ''
     });
 
     const userCurrentDefault: UserType = {
@@ -133,12 +151,13 @@ const UserList2: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged,
         status: 'active'
     };
 
+    const roles = getRoles(profile ? profile.role : '');
+
     const paginatedCryptoOrders = applyPagination(modelList, page, limit);
     const [userCurrent, setUserCurrent] = useState<UserType>(userCurrentDefault);
     const [openEdit, setOpenEdit] = useState<boolean>(false);
     const [openView, setOpenView] = useState<boolean>(false);
     const [openEditPassword, setOpenEditPassword] = useState<boolean>(false);
-    const theme = useTheme();
 
     const handlePageChange = (event: any, newPage: number): void => {
         setPage(newPage);
@@ -154,6 +173,19 @@ const UserList2: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged,
         setFilters((prevFilters) => ({
             ...prevFilters,
             status: value
+        }));
+    };
+
+    const handleRoleChange = (e: any) => {
+        let value: any = null;
+
+        if (e.target.value !== 'all') {
+            value = e.target.value;
+        }
+
+        setFilters((prevFilters) => ({
+            ...prevFilters,
+            role: value
         }));
     };
 
@@ -176,6 +208,7 @@ const UserList2: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged,
 
     useEffect(() => {
         filterStringChanged(filterString(filters));
+        setPage(0);
     }, [filters]);
 
     const handleEditDialogOpen = () => {
@@ -216,20 +249,21 @@ const UserList2: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged,
         }
     };
 
-    const onChangeStatusUser = (e: any) => {
-        console.log('onChangeStatusUser');
+    // const onChangeStatusUser = (e: any) => {
+    //     console.log('onChangeStatusUser');
 
-        setValue('status', e.target.value, {
-            shouldValidate: true,
-            shouldDirty: true
-        });
-        console.log(getValues('status'));
-    };
+    //     setValue('status', e.target.value, {
+    //         shouldValidate: true,
+    //         shouldDirty: true
+    //     });
+    //     console.log(getValues('status'));
+    // };
 
     const handleEditSubmit2 = (formValues: EditUserSchema) => {
         const id = userCurrent.id;
         const data = {
             fullName: formValues.fullName,
+            role: formValues.role,
             status: formValues.status
         };
         UserApi.update2(id, data)
@@ -246,12 +280,11 @@ const UserList2: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged,
     };
 
     const handleEditPasswordSubmit2 = (formValues: PasswordFormSchema) => {
-        console.log('formValues:', formValues);
-
         const id = userCurrent.id;
         const data = {
             password: formValues.password
         };
+
         UserApi.update2(id, data)
             .then((response: any) => {
                 setUserCurrent(userCurrentDefault);
@@ -262,7 +295,6 @@ const UserList2: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged,
                 console.log(e);
             });
         handleEditPasswordClose();
-
         handleEditDialogClose();
     };
 
@@ -270,12 +302,9 @@ const UserList2: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged,
         console.log('form errors: ', errors);
     };
 
-    const { register, handleSubmit, control, setValue, getValues, reset } = useForm<EditUserSchema>({
+    const { handleSubmit, control, reset } = useForm<EditUserSchema>({
         mode: 'onSubmit',
-        resolver: yupResolver<EditUserSchema>(editUserSchema),
-        defaultValues: useMemo(() => {
-            return userCurrent;
-        }, [userCurrent])
+        resolver: yupResolver<EditUserSchema>(editUserSchema)
     });
 
     const {
@@ -290,57 +319,33 @@ const UserList2: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged,
     useEffect(() => {
         reset(userCurrent);
     }, [userCurrent]);
+
     return (
         <>
+            <TableFilterUser
+                filters={filters}
+                statusOptions={statusOptions}
+                roleOptions={roleOptions}
+                handleSearchStrChange={handleSearchStrChange}
+                handleStatusChange={handleStatusChange}
+                handleRoleChange={handleRoleChange}
+            />
             <Card sx={{ p: 1, mb: 3 }}>
-                <Grid container spacing={2}>
-                    <Grid item xs={12} sm={6} md={8}>
-                        <Box p={1}>
-                            <TextField
-                                sx={{ m: 0 }}
-                                InputProps={{
-                                    startAdornment: (
-                                        <InputAdornment position='start'>
-                                            <SearchTwoToneIcon />
-                                        </InputAdornment>
-                                    )
-                                }}
-                                onChange={handleSearchStrChange}
-                                placeholder={'Search ...'}
-                                value={filters.searchStr}
-                                fullWidth
-                                variant='outlined'
-                            />
-                        </Box>
-                    </Grid>
-                    <Grid item xs={12} sm={6} md={4}>
-                        <Box p={1}>
-                            <FormControl fullWidth variant='outlined'>
-                                <InputLabel>{'Status'}</InputLabel>
-                                <Select value={filters.status || 'all'} onChange={handleStatusChange} label={'Status'}>
-                                    {statusOptions.map((statusOption) => (
-                                        <MenuItem key={statusOption.id} value={statusOption.id}>
-                                            {statusOption.name}
-                                        </MenuItem>
-                                    ))}
-                                </Select>
-                            </FormControl>
-                        </Box>
-                    </Grid>
-                </Grid>
-            </Card>
-            <Card>
                 <TableContainer>
-                    <Table>
+                    <Table sx={{ width: '100%', tableLayout: 'fixed' }}>
                         <TableHead>
                             <TableRow>
-                                <TableCell>#</TableCell>
+                                <TableCell sx={{ width: '5%' }}>#</TableCell>
                                 <TableCell>Full name</TableCell>
                                 <TableCell>User name</TableCell>
                                 <TableCell>Email</TableCell>
-                                <TableCell>Role</TableCell>
-                                <TableCell align='right'>Status</TableCell>
-                                <TableCell align='center'>Actions</TableCell>
+                                <TableCell sx={{ width: '10%' }}>Role</TableCell>
+                                <TableCell sx={{ width: '10%' }} align='right'>
+                                    Status
+                                </TableCell>
+                                <TableCell sx={{ width: '15%' }} align='center'>
+                                    Actions
+                                </TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -348,112 +353,42 @@ const UserList2: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged,
                                 return (
                                     <TableRow hover key={model.id}>
                                         <TableCell>
-                                            <Typography
-                                                variant='body1'
-                                                fontWeight='bold'
-                                                color='text.primary'
-                                                gutterBottom
-                                            >
-                                                {limit * page + index + 1}
-                                            </Typography>
+                                            <TableTypography>{limit * page + index + 1}</TableTypography>
                                         </TableCell>
                                         <TableCell>
-                                            <Typography
-                                                variant='body1'
-                                                fontWeight='bold'
-                                                color='text.primary'
-                                                gutterBottom
-                                            >
-                                                {model.fullName}
-                                            </Typography>
+                                            <TableTypography>{model.fullName}</TableTypography>
                                         </TableCell>
                                         <TableCell>
-                                            <Typography
-                                                variant='body1'
-                                                fontWeight='bold'
-                                                color='text.primary'
-                                                gutterBottom
-                                            >
-                                                {model.userName}
-                                            </Typography>
+                                            <TableTypography>{model.userName}</TableTypography>
                                         </TableCell>
                                         <TableCell>
-                                            <Typography
-                                                variant='body1'
-                                                fontWeight='bold'
-                                                color='text.primary'
-                                                gutterBottom
-                                            >
-                                                {model.email}
-                                            </Typography>
+                                            <TableTypography>{model.email}</TableTypography>
                                         </TableCell>
                                         <TableCell>
-                                            <Typography
-                                                variant='body1'
-                                                fontWeight='bold'
-                                                color='text.primary'
-                                                gutterBottom
-                                            >
-                                                {model.role}
-                                            </Typography>
+                                            <TableTypography>{model.role}</TableTypography>
                                         </TableCell>
                                         <TableCell align='right'>{getStatusLabel(model.status)}</TableCell>
                                         <TableCell align='center'>
-                                            <Tooltip title='View user' arrow>
-                                                <IconButton
-                                                    onClick={() => handleViewUserOpen(model)}
-                                                    sx={{
-                                                        '&:hover': {
-                                                            background: theme.colors.warning.lighter
-                                                        },
-                                                        color: theme.palette.warning.main
-                                                    }}
-                                                    color='inherit'
-                                                    size='small'
-                                                >
-                                                    <VisibilityTwoToneIcon fontSize='small' />
-                                                </IconButton>
-                                            </Tooltip>
                                             {profile?.role === 'admin' && (
-                                                <>
-                                                    <Tooltip title='Edit User' arrow>
-                                                        <IconButton
-                                                            onClick={() => handleEditUserOpen(model)}
-                                                            sx={{
-                                                                '&:hover': {
-                                                                    background: theme.colors.primary.lighter
-                                                                },
-                                                                color: theme.palette.primary.main
-                                                            }}
-                                                            color='inherit'
-                                                            size='small'
-                                                        >
-                                                            <EditTwoToneIcon fontSize='small' />
-                                                        </IconButton>
-                                                    </Tooltip>
-                                                </>
+                                                <TableActions
+                                                    nameModels='task'
+                                                    handleViewModel={() => handleViewUserOpen(model)}
+                                                    handleEditModel={() => handleEditUserOpen(model)}
+                                                />
                                             )}
-                                            {profile?.role === 'manager' && model.role === 'employee' ? (
-                                                <>
-                                                    <Tooltip title='Edit User' arrow>
-                                                        <IconButton
-                                                            onClick={() => handleEditUserOpen(model)}
-                                                            sx={{
-                                                                '&:hover': {
-                                                                    background: theme.colors.primary.lighter
-                                                                },
-                                                                color: theme.palette.primary.main
-                                                            }}
-                                                            color='inherit'
-                                                            size='small'
-                                                        >
-                                                            <EditTwoToneIcon fontSize='small' />
-                                                        </IconButton>
-                                                    </Tooltip>
-                                                </>
-                                            ) : (
-                                                <></>
-                                            )}
+                                            {profile?.role === 'manager' &&
+                                                (model.role === 'employee' ? (
+                                                    <TableActions
+                                                        nameModels='task'
+                                                        handleViewModel={() => handleViewUserOpen(model)}
+                                                        handleEditModel={() => handleEditUserOpen(model)}
+                                                    />
+                                                ) : (
+                                                    <TableActions
+                                                        nameModels='task'
+                                                        handleViewModel={() => handleViewUserOpen(model)}
+                                                    />
+                                                ))}
                                         </TableCell>
                                     </TableRow>
                                 );
@@ -484,7 +419,12 @@ const UserList2: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged,
                                         <MuiTextField label='Full name' name='fullName' control={control} />
                                     </Grid>
                                     <Grid item xs={12} md={6}>
-                                        <MuiReadOnlyTextField label='Role' name='role' control={control} />
+                                        <MuiAutocomplete
+                                            options={roles}
+                                            control={control}
+                                            name='role'
+                                            placeholder='Choose role'
+                                        />
                                     </Grid>
 
                                     <Grid item xs={12} md={6}>
@@ -500,10 +440,11 @@ const UserList2: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged,
                                         </Button>
                                     </Grid>
                                     <Grid item xs={12} md={6}>
-                                        <ToggleButtonGroup color='primary' exclusive aria-label='Platform'>
-                                            <ToggleButton value='active'>Active</ToggleButton>
-                                            <ToggleButton value='disabled'>Disabled</ToggleButton>
-                                        </ToggleButtonGroup>
+                                        <StatusToggleButton
+                                            name='status'
+                                            control={control}
+                                            statusValues={statusValues}
+                                        />
                                     </Grid>
                                 </Grid>
                             </Grid>
@@ -563,124 +504,16 @@ const UserList2: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged,
                     </DialogActions>
                 </form>
             </MuiDialog>
-            {/* <Dialog fullWidth maxWidth='md' open={openEditPassword} onClose={handleEditPasswordClose}>
-                <DialogTitle
-                    sx={{
-                        p: 3
-                    }}
-                >
-                    <Typography variant='h4' gutterBottom>
-                        {'Edit user password'}
-                    </Typography>
-                </DialogTitle>
-                <form>
-                    <DialogContent
-                        dividers
-                        sx={{
-                            p: 3
-                        }}
-                    >
-                        <Grid container spacing={3}>
-                            <Grid item xs={12}>
-                                <Grid container spacing={3}>
-                                    <Grid item xs={12} md={6}>
-                                        <TextField
-                                            fullWidth
-                                            error={helperTextStatus.password}
-                                            label={'Password'}
-                                            name='password'
-                                            onBlur={handleBlur}
-                                            onChange={onChangePassword}
-                                            type='password'
-                                            value={password}
-                                            helperText={helperTextStr.password}
-                                            variant='outlined'
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12} md={6}>
-                                        <TextField
-                                            fullWidth
-                                            error={helperTextStatus.passwordConfirm}
-                                            label={'Confirm password'}
-                                            name='passwordConfirm'
-                                            onBlur={handleBlur}
-                                            onChange={onChangePasswordConfirm}
-                                            type='password'
-                                            value={passwordConfirm}
-                                            helperText={helperTextStr.passwordConfirm}
-                                            variant='outlined'
-                                        />
-                                    </Grid>
-                                </Grid>
-                            </Grid>
-                        </Grid>
-                    </DialogContent>
-                    <DialogActions
-                        sx={{
-                            p: 3
-                        }}
-                    >
-                        <Button color='secondary' onClick={handleEditPasswordClose}>
-                            {'Cancel'}
-                        </Button>
-                        <Button onClick={handleEditPasswordSubmit} variant='contained'>
-                            {'Save'}
-                        </Button>
-                    </DialogActions>
-                </form>
-                <IconButton
-                    aria-label='close'
-                    onClick={handleEditPasswordClose}
-                    sx={{
-                        position: 'absolute',
-                        right: 8,
-                        top: 8,
-                        color: (theme) => theme.palette.grey[500]
-                    }}
-                >
-                    <CloseIcon />
-                </IconButton>
-            </Dialog> */}
-            {/* <Dialog fullWidth maxWidth='lg' open={openView} onClose={handleViewUserClose}>
-                <DialogTitle
-                    sx={{
-                        p: 3
-                    }}
-                >
-                    <Typography variant='h4' gutterBottom>
-                        {'User'}
-                    </Typography>
-                </DialogTitle>
-                <DialogContent
-                    dividers
-                    sx={{
-                        p: 3
-                    }}
-                >
+            <MuiDialog title='User Profile' subTitle='' open={openView} handleClose={handleViewUserClose}>
+                <DialogContent dividers sx={{ p: 3 }}>
                     <UserProfile userCurrent={userCurrent} />
                 </DialogContent>
-                <DialogActions
-                    sx={{
-                        p: 3
-                    }}
-                >
+                <DialogActions sx={{ p: 3 }}>
                     <Button color='secondary' onClick={handleViewUserClose}>
                         {'Cancel'}
                     </Button>
                 </DialogActions>
-                <IconButton
-                    aria-label='close'
-                    onClick={handleViewUserClose}
-                    sx={{
-                        position: 'absolute',
-                        right: 8,
-                        top: 8,
-                        color: (theme) => theme.palette.grey[500]
-                    }}
-                >
-                    <CloseIcon />
-                </IconButton>
-            </Dialog> */}
+            </MuiDialog>
         </>
     );
 };

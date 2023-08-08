@@ -28,6 +28,7 @@ import {
     DialogTitle,
     DialogActions,
     DialogContent,
+    Divider,
     styled
 } from '@mui/material';
 import Label from 'src/components/Label';
@@ -40,8 +41,10 @@ import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
 import { TaskType, TaskStatusType } from 'src/types/TaskType';
 import TaskApi from 'src/apis/task.api';
 import { AppContext } from 'src/contexts/app.context';
-import TaskView from './TaskView';
+import TaskView from '../../Tasks/TaskView';
 import { notistackSuccess } from 'src/components/Notistack';
+import TableTypography from 'src/components/TableTypography';
+import TableActions from 'src/pages/components/TableActions';
 
 interface RecentOrdersTableProps {
     className?: string;
@@ -281,7 +284,8 @@ const TaskList: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged, 
         setOpenView(false);
     };
 
-    const handleViewUserOpen = (id: string) => {
+    const handleViewUserOpen = (model: TaskType) => {
+        const id = model.id ? model.id.toString() : '';
         TaskApi.getById(id)
             .then((response: any) => {
                 setTaskCurrent(() => ({
@@ -296,19 +300,13 @@ const TaskList: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged, 
     };
     return (
         <>
-            <Card
-                sx={{
-                    p: 1,
-                    mb: 3
-                }}
-            >
+            <Card sx={{ p: 1, mb: 3 }}></Card>
+            <Card sx={{ p: 1, mb: 3 }}>
                 <Grid container spacing={2}>
                     <Grid item xs={12} sm={6} md={8}>
                         <Box p={1}>
                             <TextField
-                                sx={{
-                                    m: 0
-                                }}
+                                sx={{ m: 0 }}
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position='start'>
@@ -339,41 +337,27 @@ const TaskList: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged, 
                         </Box>
                     </Grid>
                 </Grid>
-            </Card>
-            <Card
-                sx={{
-                    p: 1,
-                    mb: 3
-                }}
-            >
+                <Divider />
                 <TableContainer>
-                    <Table>
+                    <Table sx={{ width: '100%', tableLayout: 'fixed' }}>
                         <TableHead>
                             <TableRow>
-                                <TableCell>#</TableCell>
-                                <TableCell width='20%'>Task name</TableCell>
+                                <TableCell sx={{ width: '5%' }}>#</TableCell>
+                                <TableCell>Task name</TableCell>
                                 <TableCell>Description</TableCell>
-                                {profile?.role !== 'employee' && <TableCell>UserName</TableCell>}
-
-                                <TableCell align='right'>Status</TableCell>
-                                <TableCell align='right'>Actions</TableCell>
+                                {profile?.role !== 'employee' && <TableCell sx={{ width: '10%' }}>UserName</TableCell>}
+                                <TableCell align='right' sx={{ width: '10%' }}>
+                                    Status
+                                </TableCell>
+                                <TableCell align='right' sx={{ width: '15%' }}>
+                                    Actions
+                                </TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
                             {paginatedCryptoOrders.map((model, index) => {
                                 return (
                                     <TableRow hover key={model.id}>
-                                        <TableCell>
-                                            <Typography
-                                                variant='body1'
-                                                fontWeight='bold'
-                                                color='text.primary'
-                                                gutterBottom
-                                                noWrap
-                                            >
-                                                {limit * page + index + 1}
-                                            </Typography>
-                                        </TableCell>
                                         <TableCell>
                                             <Typography
                                                 variant='body1'
@@ -387,6 +371,25 @@ const TaskList: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged, 
                                                     WebkitLineClamp: '2',
                                                     WebkitBoxOrient: 'vertical'
                                                 }}
+                                            >
+                                                {limit * page + index + 1}
+                                            </Typography>
+                                        </TableCell>
+                                        <TableCell>
+                                            <Typography
+                                                display='inline'
+                                                variant='body1'
+                                                fontWeight='bold'
+                                                color='text.primary'
+                                                gutterBottom
+                                                sx={{
+                                                    overflow: 'hidden',
+                                                    textOverflow: 'ellipsis',
+                                                    display: '-webkit-box',
+                                                    WebkitLineClamp: '1',
+                                                    WebkitBoxOrient: 'vertical'
+                                                }}
+                                                style={{ wordWrap: 'break-word' }}
                                             >
                                                 {model.title}
                                             </Typography>
@@ -404,6 +407,7 @@ const TaskList: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged, 
                                                     WebkitLineClamp: '2',
                                                     WebkitBoxOrient: 'vertical'
                                                 }}
+                                                style={{ wordWrap: 'break-word' }}
                                             >
                                                 {model.description}
                                             </Typography>
@@ -415,7 +419,13 @@ const TaskList: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged, 
                                                     fontWeight='bold'
                                                     color='text.primary'
                                                     gutterBottom
-                                                    noWrap
+                                                    sx={{
+                                                        overflow: 'hidden',
+                                                        textOverflow: 'ellipsis',
+                                                        display: '-webkit-box',
+                                                        WebkitLineClamp: '2',
+                                                        WebkitBoxOrient: 'vertical'
+                                                    }}
                                                 >
                                                     {model.user?.userName}
                                                 </Typography>
@@ -424,63 +434,23 @@ const TaskList: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged, 
 
                                         <TableCell align='right'>{getStatusLabel(model.status)}</TableCell>
                                         <TableCell align='right'>
-                                            <Typography
-                                                variant='body1'
-                                                fontWeight='bold'
-                                                color='text.primary'
-                                                gutterBottom
-                                                noWrap
-                                            >
-                                                <Tooltip title='View user' arrow>
-                                                    <IconButton
-                                                        onClick={() => handleViewUserOpen(model.id.toString())}
-                                                        sx={{
-                                                            '&:hover': {
-                                                                background: theme.colors.warning.lighter
-                                                            },
-                                                            color: theme.palette.warning.main
-                                                        }}
-                                                        color='inherit'
-                                                        size='small'
-                                                    >
-                                                        <VisibilityTwoToneIcon fontSize='small' />
-                                                    </IconButton>
-                                                </Tooltip>
-                                                {(profile?.role === 'admin' || profile?.role === 'employee') && (
-                                                    <>
-                                                        <Tooltip title='Edit Task' arrow>
-                                                            <IconButton
-                                                                onClick={() => handleEditTaskOpen(model)}
-                                                                sx={{
-                                                                    '&:hover': {
-                                                                        background: theme.colors.primary.lighter
-                                                                    },
-                                                                    color: theme.palette.primary.main
-                                                                }}
-                                                                color='inherit'
-                                                                size='small'
-                                                            >
-                                                                <EditTwoToneIcon fontSize='small' />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                        <Tooltip title='Delete Order' arrow>
-                                                            <IconButton
-                                                                onClick={() => handleConfirmDelete(model)}
-                                                                sx={{
-                                                                    '&:hover': {
-                                                                        background: theme.colors.error.lighter
-                                                                    },
-                                                                    color: theme.palette.error.main
-                                                                }}
-                                                                color='inherit'
-                                                                size='small'
-                                                            >
-                                                                <DeleteTwoToneIcon fontSize='small' />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                    </>
-                                                )}
-                                            </Typography>
+                                            {profile?.role === 'admin' || profile?.role === 'employee' ? (
+                                                <TableTypography>
+                                                    <TableActions
+                                                        nameModels='task'
+                                                        handleViewModel={() => handleViewUserOpen(model)}
+                                                        handleEditModel={() => handleEditTaskOpen(model)}
+                                                        handleDeleteModel={() => handleConfirmDelete(model)}
+                                                    />
+                                                </TableTypography>
+                                            ) : (
+                                                <TableTypography>
+                                                    <TableActions
+                                                        nameModels='task'
+                                                        handleViewModel={() => handleViewUserOpen(model)}
+                                                    />
+                                                </TableTypography>
+                                            )}
                                         </TableCell>
                                     </TableRow>
                                 );
@@ -502,22 +472,13 @@ const TaskList: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged, 
             </Card>
 
             <Dialog fullWidth maxWidth='md' open={openEdit} onClose={handleCreateTaskClose}>
-                <DialogTitle
-                    sx={{
-                        p: 3
-                    }}
-                >
+                <DialogTitle sx={{ p: 3 }}>
                     <Typography variant='h4' gutterBottom>
                         {'Edit task'}
                     </Typography>
                 </DialogTitle>
                 <form>
-                    <DialogContent
-                        dividers
-                        sx={{
-                            p: 3
-                        }}
-                    >
+                    <DialogContent dividers sx={{ p: 3 }}>
                         <Grid container spacing={3}>
                             <Grid item xs={12}>
                                 <Grid container spacing={3}>
@@ -578,11 +539,7 @@ const TaskList: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged, 
                             </Grid>
                         </Grid>
                     </DialogContent>
-                    <DialogActions
-                        sx={{
-                            p: 3
-                        }}
-                    >
+                    <DialogActions sx={{ p: 3 }}>
                         <Button color='secondary' onClick={handleCreateTaskClose}>
                             {'Cancel'}
                         </Button>
@@ -654,28 +611,15 @@ const TaskList: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged, 
                 </Box>
             </DialogWrapper>
             <Dialog fullWidth maxWidth='sm' open={openView} onClose={handleViewTaskClose}>
-                <DialogTitle
-                    sx={{
-                        p: 3
-                    }}
-                >
+                <DialogTitle sx={{ p: 3 }}>
                     <Typography variant='h4' gutterBottom>
                         {'Task'}
                     </Typography>
                 </DialogTitle>
-                <DialogContent
-                    dividers
-                    sx={{
-                        p: 3
-                    }}
-                >
+                <DialogContent dividers sx={{ p: 3 }}>
                     <TaskView taskCurrent={taskCurrent} />
                 </DialogContent>
-                <DialogActions
-                    sx={{
-                        p: 3
-                    }}
-                >
+                <DialogActions sx={{ p: 3 }}>
                     <Button color='secondary' onClick={handleViewTaskClose}>
                         {'Cancel'}
                     </Button>

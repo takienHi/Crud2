@@ -5,10 +5,6 @@ import Logo from 'src/components/LogoSign';
 
 import { Helmet } from 'react-helmet-async';
 import RegisterForm from './RegisterForm';
-import RegisterForm2 from './RegisterForm2';
-
-import { useState } from 'react';
-import { UserType } from 'src/types/UserType';
 
 const MainContent = styled(Box)(
     () => `
@@ -38,36 +34,17 @@ function Register() {
                 <TopWrapper>
                     <Container maxWidth='sm'>
                         <Logo />
-                        <Card
-                            sx={{
-                                mt: 3,
-                                px: 4,
-                                pt: 5,
-                                pb: 3
-                            }}
-                        >
+                        <Card sx={{ mt: 3, px: 4, pt: 5, pb: 3 }}>
                             <Box>
-                                <Typography
-                                    variant='h2'
-                                    sx={{
-                                        mb: 1
-                                    }}
-                                >
+                                <Typography variant='h2' sx={{ mb: 1 }}>
                                     {'Sign in'}
                                 </Typography>
-                                <Typography
-                                    variant='h4'
-                                    color='text.secondary'
-                                    fontWeight='normal'
-                                    sx={{
-                                        mb: 3
-                                    }}
-                                >
+                                <Typography variant='h4' color='text.secondary' fontWeight='normal' sx={{ mb: 3 }}>
                                     {'Fill in the fields below to sign into your account.'}
                                 </Typography>
                             </Box>
                             {/* <RegisterForm /> */}
-                            <RegisterForm2 />
+                            <RegisterForm />
                             <Box my={4}>
                                 <Typography component='span' variant='subtitle2' color='text.primary' fontWeight='bold'>
                                     {'Already have an account?'}

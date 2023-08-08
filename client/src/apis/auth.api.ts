@@ -3,8 +3,32 @@ import { UserType as IUserData } from '../types/UserType';
 import { LoginSchema } from 'src/schema/authSchema';
 import { ResultApiType } from 'src/types/ResultApiType';
 
-const login = (email: string, password: string) => {
-    return http.get<IUserData>(`/users/?email=${email}&password=${password}`);
+const loginGoogle = async (response: any) => {
+    const result: ResultApiType = {
+        check: false,
+        message: 'Your account is not registered',
+        data: {}
+    };
+
+    await http
+        .get<IUserData>(`/users/?email=${response.email}`)
+        .then((response: any) => {
+            if (response.data[0] && response.data[0].status === 'active') {
+                const data = response.data[0];
+
+                result.check = true;
+                result.message = 'Login successfully!';
+                result.data = data;
+            } else {
+                result.check = false;
+                result.message = 'Your account has been locked!';
+            }
+        })
+        .catch((e: Error) => {
+            console.log(e);
+        });
+
+    return result;
 };
 
 const login2 = async (formValues: LoginSchema) => {
@@ -17,12 +41,17 @@ const login2 = async (formValues: LoginSchema) => {
     await http
         .get<IUserData>(`/users/?email=${formValues.email}&password=${formValues.password}`)
         .then((response: any) => {
-            if (response.data[0]) {
+            console.log(response.data[0]);
+
+            if (response.data[0].status === 'active') {
                 const data = response.data[0];
 
                 result.check = true;
                 result.message = 'Login successfully!';
                 result.data = data;
+            } else {
+                result.check = false;
+                result.message = 'Your account has been locked!';
             }
         })
         .catch((e: Error) => {
@@ -32,11 +61,15 @@ const login2 = async (formValues: LoginSchema) => {
     await http
         .get<IUserData>(`/users/?userName=${formValues.email}&password=${formValues.password}`)
         .then((response: any) => {
-            if (response.data[0]) {
+            if (response.data[0].status === 'active') {
                 const data = response.data[0];
+
                 result.check = true;
                 result.message = 'Login successfully!';
                 result.data = data;
+            } else {
+                result.check = false;
+                result.message = 'Your account has been locked!';
             }
         })
         .catch((e: Error) => {
@@ -84,9 +117,21 @@ const register = async (user: IUserData) => {
     return result;
 };
 
+const registerGoogle = async (user: IUserData) => {
+    const result: ResultApiType = {
+        check: true,
+        message: 'account successfully created',
+        data: {}
+    };
+
+    http.post<IUserData>('/users', user);
+
+    return result;
+};
 const AuthApi = {
-    login,
+    loginGoogle,
     login2,
-    register
+    register,
+    registerGoogle
 };
 export default AuthApi;

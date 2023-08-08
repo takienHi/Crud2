@@ -10,9 +10,9 @@ export const createUserSchema = yup.object().shape({
         .string()
         .required()
         .min(2)
-        .max(20)
+        .max(50)
         .matches(regexAlphabet, 'Only alphabet and number')
-        .test('Unique Email', 'Email already in use', function (item) {
+        .test('Unique UserName', 'UserName already in use', function (item) {
             return UserApi.checkUserNameUnique(item);
         }),
     email: yup
@@ -33,6 +33,7 @@ export type CreateUserSchema = yup.InferType<typeof createUserSchema>;
 
 export const editUserSchema = yup.object().shape({
     fullName: yup.string().required().min(6).max(100),
+    role: yup.mixed<RoleType>().oneOf(['admin', 'manager', 'employee']).required(),
     status: yup.string().required()
 });
 
@@ -47,3 +48,9 @@ export const passwordFormSchema = yup.object().shape({
 });
 
 export type PasswordFormSchema = yup.InferType<typeof passwordFormSchema>;
+
+export const editFullNameSchema = yup.object().shape({
+    fullName: yup.string().required().min(6).max(50)
+});
+
+export type EditFullNameSchema = yup.InferType<typeof editFullNameSchema>;

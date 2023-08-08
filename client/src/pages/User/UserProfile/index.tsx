@@ -1,16 +1,4 @@
-import {
-    Box,
-    Typography,
-    Link,
-    Badge,
-    List,
-    ListItem,
-    ListItemText,
-    Avatar,
-    Divider,
-    useTheme,
-    Button
-} from '@mui/material';
+import { Box, Typography, Link, Badge, List, ListItem, ListItemText, Avatar, Divider, useTheme } from '@mui/material';
 
 import { UserType } from 'src/types/UserType';
 import Label from 'src/components/Label';
@@ -22,6 +10,7 @@ import TaskApi from 'src/apis/task.api';
 type PropsType = {
     userCurrent?: UserType;
 };
+
 function Profile({ userCurrent }: PropsType) {
     const [tasks, setTasks] = useState<TaskType[]>([]);
     const [filterString, setFilterString] = useState<string>('');
@@ -69,12 +58,7 @@ function Profile({ userCurrent }: PropsType) {
                         {userCurrent?.userName}
                     </Avatar>
                 </Badge>
-                <Box
-                    sx={{
-                        width: '100%'
-                    }}
-                    ml={1.5}
-                >
+                <Box sx={{ width: '100%' }} ml={1.5}>
                     <Link
                         href='#'
                         color='text.primary'
@@ -95,18 +79,8 @@ function Profile({ userCurrent }: PropsType) {
                         {userCurrent?.role}
                     </Typography>
                 </Box>
-                <Box
-                    sx={{
-                        width: '100%'
-                    }}
-                    mr={'10%'}
-                >
-                    <List
-                        disablePadding
-                        sx={{
-                            my: 1.5
-                        }}
-                    >
+                <Box sx={{ width: '100%' }} mr={'10%'}>
+                    <List disablePadding sx={{ my: 1.5 }}>
                         <ListItem disableGutters>
                             <ListItemText
                                 primaryTypographyProps={{
@@ -117,21 +91,11 @@ function Profile({ userCurrent }: PropsType) {
                             <Typography variant='subtitle1'>{userCurrent?.userName}</Typography>
                         </ListItem>
                         <ListItem disableGutters>
-                            <ListItemText
-                                primaryTypographyProps={{
-                                    variant: 'h5'
-                                }}
-                                primary={`${'Email'}:`}
-                            />
+                            <ListItemText primaryTypographyProps={{ variant: 'h5' }} primary={`${'Email'}:`} />
                             <Typography variant='subtitle1'>{userCurrent?.email}</Typography>
                         </ListItem>
                         <ListItem disableGutters>
-                            <ListItemText
-                                primaryTypographyProps={{
-                                    variant: 'h5'
-                                }}
-                                primary={`${'Status'}:`}
-                            />
+                            <ListItemText primaryTypographyProps={{ variant: 'h5' }} primary={`${'Status'}:`} />
                             <Typography variant='subtitle1'>
                                 {userCurrent?.status === 'active' ? (
                                     <Label color='success'>Active</Label>
@@ -143,9 +107,20 @@ function Profile({ userCurrent }: PropsType) {
                     </List>
                 </Box>
             </Box>
-
-            <Divider />
-            <TaskList modelList={tasks} filterStringChanged={filterStringChanged} EditTaskComplete={EditTaskComplete} />
+            {userCurrent?.role === 'employee' &&
+                (tasks.length >= 1 ? (
+                    <TaskList
+                        modelList={tasks}
+                        filterStringChanged={filterStringChanged}
+                        EditTaskComplete={EditTaskComplete}
+                    />
+                ) : (
+                    <>
+                        <Typography variant='subtitle1' align='center'>
+                            No data...
+                        </Typography>
+                    </>
+                ))}
         </>
     );
 }

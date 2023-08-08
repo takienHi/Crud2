@@ -1,15 +1,13 @@
 import useRouteElements from './useRouteElements';
 import ThemeProvider from './theme/ThemeProvider';
-// import AdapterDateFns from '@mui/lab/AdapterDateFns';
 import { AdapterDateFns } from '@mui/x-date-pickers/AdapterDateFns';
-// import LocalizationProvider from '@mui/lab/LocalizationProvider';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { CssBaseline } from '@mui/material';
 
-import { ToastContainer } from 'react-toastify';
-import 'react-toastify/dist/ReactToastify.css';
 import { SnackbarProvider } from 'notistack';
+import { GoogleOAuthProvider } from '@react-oauth/google';
 
+const clientId = '1068744228163-qvdel1c0qn91jk3q7dgdrb3ilo7ih17q.apps.googleusercontent.com';
 function App() {
     const routeElements = useRouteElements();
     return (
@@ -17,8 +15,9 @@ function App() {
             <ThemeProvider>
                 <LocalizationProvider dateAdapter={AdapterDateFns}>
                     <CssBaseline />
-                    <SnackbarProvider>{routeElements}</SnackbarProvider>
-                    <ToastContainer />
+                    <SnackbarProvider>
+                        <GoogleOAuthProvider clientId={clientId}>{routeElements}</GoogleOAuthProvider>;
+                    </SnackbarProvider>
                 </LocalizationProvider>
             </ThemeProvider>
         </>

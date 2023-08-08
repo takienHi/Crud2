@@ -13,6 +13,7 @@ const MuiAutocomplete = <O extends { value: string; label: string }, TField exte
     props: MuiAutocompleteProps<O, TField>
 ) => {
     const { control, options, name } = props;
+
     return (
         <Controller
             name={name}

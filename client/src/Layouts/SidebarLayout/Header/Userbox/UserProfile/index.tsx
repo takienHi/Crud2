@@ -10,8 +10,6 @@ import {
     Button,
     Divider,
     useTheme,
-    Dialog,
-    DialogTitle,
     DialogActions,
     DialogContent,
     Grid,
@@ -27,16 +25,22 @@ import CloseIcon from '@mui/icons-material/Close';
 import UserApi from 'src/apis/user.api';
 import { setProfileToLS } from 'src/utils/auth';
 import { notistackSuccess } from 'src/components/Notistack';
+import MuiTextField from 'src/components/MuiTextField/MuiTextField';
+import { EditFullNameSchema, PasswordFormSchema, editFullNameSchema, passwordFormSchema } from 'src/schema/userSchema';
+import { useForm } from 'react-hook-form';
+import { yupResolver } from '@hookform/resolvers/yup';
+import MuiDialog from 'src/components/MuiDialog/MuiDialog';
 
 const userCurrentDefault: UserType = {
     id: '',
     fullName: '',
     userName: '',
     email: '',
-    role: '',
+    role: 'employee',
     password: '',
     status: 'active'
 };
+
 const helperTextStatusS = {
     fullName: false,
     userName: false,
@@ -61,10 +65,7 @@ function Profile() {
     const theme = useTheme();
     const [openEdit, setOpenEdit] = useState<boolean>(false);
     const [openEditPassword, setOpenEditPassword] = useState<boolean>(false);
-    const [fullName, setFullName] = useState<string>('');
     const [currentPassword, setCurrentPassword] = useState<string>('');
-    const [password, setPassword] = useState<string>('');
-    const [passwordConfirm, setPasswordConfirm] = useState<string>('');
     const [userCurrent, setUserCurrent] = useState({ ...userCurrentDefault });
 
     const [helperTextStatus, setHelperTextStatus] = useState({ ...helperTextStatusS });
@@ -73,16 +74,13 @@ function Profile() {
 
     useEffect(() => {
         if (profile) setUserCurrent(profile);
-    }, []);
+    }, [profile]);
+
     const handleEditDialogOpen = () => {
-        setFullName(userCurrent.fullName ? userCurrent.fullName : '');
         setOpenEdit(true);
     };
 
     const handleEditDialogClose = () => {
-        resetForm();
-        setHelperTextStr({ ...helperTextStrS });
-        setHelperTextStatus({ ...helperTextStatusS });
         setOpenEdit(false);
     };
 
@@ -101,24 +99,13 @@ function Profile() {
         handleEditDialogOpen();
     };
 
-    const resetForm = () => {
-        setFullName('');
-    };
-
     const resetPasswordForm = () => {
         setCurrentPassword('');
-        setPassword('');
-        setPasswordConfirm('');
+        resetPassword();
     };
 
     const validateOnce = (nameInput: string) => {
         let textCheck = '';
-
-        if (nameInput === 'fullName') {
-            if (fullName === null || fullName === '') {
-                textCheck = 'The full name field is required';
-            }
-        }
 
         if (nameInput === 'currentPassword') {
             if (currentPassword === null || currentPassword === '') {
@@ -126,17 +113,6 @@ function Profile() {
             }
         }
 
-        if (nameInput === 'password') {
-            if (password === null || password === '') {
-                textCheck = 'The password is required';
-            }
-        }
-
-        if (nameInput === 'passwordConfirm') {
-            if (passwordConfirm !== password) {
-                textCheck = 'Confirm password is incorrect';
-            }
-        }
         return textCheck;
     };
 
@@ -176,11 +152,6 @@ function Profile() {
         }));
     };
 
-    const onChangeFullName = (e: ChangeEvent<HTMLInputElement>): void => {
-        onErrorOff(e.target.name.toString());
-        setFullName(e.target.value);
-    };
-
     const validateOnSubmitPassword = () => {
         let checkValidate = true;
 
@@ -212,88 +183,38 @@ function Profile() {
             helperTextStr2.currentPassword = 'The password is not the same as the current password';
         }
 
-        if (password === null || password === '') {
-            checkValidate = false;
-            helperTextStatus2.password = true;
-            helperTextStr2.password = 'The password field is required';
-        }
-
-        if (passwordConfirm !== password) {
-            checkValidate = false;
-            helperTextStatus2.passwordConfirm = true;
-            helperTextStr2.passwordConfirm = 'Confirm password is incorrect';
-        }
-
-        console.log('helperTextStatus2:', helperTextStatus2);
-
         setHelperTextStatus(helperTextStatus2);
         setHelperTextStr(helperTextStr2);
         return checkValidate;
     };
 
-    const validateOnSubmitEdit = () => {
-        let checkValidate = true;
-
-        const helperTextStatus2 = {
-            fullName: false,
-            userName: false,
-            email: false,
-            password: false,
-            passwordConfirm: false,
-            currentPassword: false
+    const handleEditSubmit = (formValues: EditFullNameSchema) => {
+        const id = userCurrent.id;
+        const data = {
+            fullName: formValues.fullName
         };
-
-        const helperTextStr2 = {
-            fullName: '',
-            userName: '',
-            email: '',
-            password: '',
-            passwordConfirm: '',
-            currentPassword: ''
-        };
-
-        if (fullName === null || fullName === '') {
-            checkValidate = false;
-            helperTextStatus2.fullName = true;
-            helperTextStr2.fullName = 'The fullName field is required';
-        }
-
-        console.log('helperTextStatus2:', helperTextStatus2);
-
-        setHelperTextStatus(helperTextStatus2);
-        setHelperTextStr(helperTextStr2);
-        return checkValidate;
+        UserApi.update2(id, data)
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            .then((response: any) => {
+                if (response.data !== undefined) {
+                    const newUser = response.data;
+                    setIsAuthenticated(true);
+                    setProfile(newUser);
+                    setProfileToLS(newUser);
+                    notistackSuccess('The user has been updated');
+                }
+            })
+            .catch((e: Error) => {
+                console.log(e);
+            });
+        handleEditDialogClose();
     };
 
-    const handleEditSubmit = () => {
-        if (validateOnSubmitEdit()) {
+    const handleEditPasswordSubmit = (formValues: PasswordFormSchema) => {
+        if (validateOnSubmitPassword() || !currentPassword) {
             const id = userCurrent.id;
             const data = {
-                fullName: fullName
-            };
-            UserApi.update2(id, data)
-                // eslint-disable-next-line @typescript-eslint/no-unused-vars
-                .then((response: any) => {
-                    if (response.data !== undefined) {
-                        const newUser = response.data;
-                        setIsAuthenticated(true);
-                        setProfile(newUser);
-                        setProfileToLS(newUser);
-                        notistackSuccess('The user has been updated');
-                    }
-                })
-                .catch((e: Error) => {
-                    console.log(e);
-                });
-            handleEditDialogClose();
-        }
-    };
-
-    const handleEditPasswordSubmit = () => {
-        if (validateOnSubmitPassword()) {
-            const id = userCurrent.id;
-            const data = {
-                password: password
+                password: formValues.password
             };
             UserApi.update2(id, data)
                 .then((response: any) => {
@@ -309,7 +230,6 @@ function Profile() {
                     console.log(e);
                 });
             handleEditPasswordClose();
-
             handleEditDialogClose();
         }
     };
@@ -320,17 +240,34 @@ function Profile() {
         setCurrentPassword(e.target.value);
     };
 
-    const onChangePassword = (e: ChangeEvent<HTMLInputElement>): void => {
-        onErrorOff(e.target.name.toString());
-
-        setPassword(e.target.value);
+    const onError = (errors: any) => {
+        console.log('form errors: ', errors);
     };
 
-    const onChangePasswordConfirm = (e: ChangeEvent<HTMLInputElement>): void => {
-        onErrorOff(e.target.name.toString());
+    const {
+        handleSubmit: handleSubmitEdit,
+        control: controlEdit,
+        reset: resetEdit
+    } = useForm<EditFullNameSchema>({
+        mode: 'onSubmit',
+        resolver: yupResolver<EditFullNameSchema>(editFullNameSchema),
+        defaultValues: {
+            fullName: userCurrent.fullName
+        }
+    });
 
-        setPasswordConfirm(e.target.value);
-    };
+    const {
+        handleSubmit: handleSubmitPassword,
+        control: controlPassword,
+        reset: resetPassword
+    } = useForm<PasswordFormSchema>({
+        mode: 'onSubmit',
+        resolver: yupResolver<PasswordFormSchema>(passwordFormSchema)
+    });
+
+    useEffect(() => {
+        resetEdit(userCurrent);
+    }, [userCurrent]);
 
     return (
         <>
@@ -350,12 +287,7 @@ function Profile() {
                         {userCurrent.userName}
                     </Avatar>
                 </Badge>
-                <Box
-                    sx={{
-                        width: '100%'
-                    }}
-                    ml={1.5}
-                >
+                <Box sx={{ width: '100%' }} ml={1.5}>
                     <Link
                         href='#'
                         color='text.primary'
@@ -377,12 +309,7 @@ function Profile() {
                     </Typography>
                 </Box>
             </Box>
-            <List
-                disablePadding
-                sx={{
-                    my: 1.5
-                }}
-            >
+            <List disablePadding sx={{ my: 1.5 }}>
                 <ListItem disableGutters>
                     <ListItemText
                         primaryTypographyProps={{
@@ -416,11 +343,7 @@ function Profile() {
                         )}
                     </Typography>
                 </ListItem>
-                <Divider
-                    sx={{
-                        mb: 3
-                    }}
-                />
+                <Divider sx={{ mb: 3 }} />
                 <Button
                     onClick={() => handleEditUserOpen()}
                     variant='contained'
@@ -445,52 +368,31 @@ function Profile() {
                     {'Change password'}
                 </Button>
             </List>
-            <Dialog fullWidth maxWidth='sm' open={openEdit} onClose={handleEditDialogClose}>
-                <DialogTitle
-                    sx={{
-                        p: 3
-                    }}
-                >
-                    <Typography variant='h4' gutterBottom>
-                        {'Edit user'}
-                    </Typography>
-                </DialogTitle>
-                <form>
-                    <DialogContent
-                        dividers
-                        sx={{
-                            p: 3
-                        }}
-                    >
+            <MuiDialog
+                title='Edit profile'
+                subTitle=''
+                fullWidth
+                maxWidth='sm'
+                open={openEdit}
+                handleClose={handleEditDialogClose}
+            >
+                <form noValidate onSubmit={handleSubmitEdit(handleEditSubmit, onError)}>
+                    <DialogContent dividers sx={{ p: 3 }}>
                         <Grid container spacing={3}>
                             <Grid item xs={12}>
                                 <Grid container spacing={3}>
                                     <Grid item xs={12} md={12}>
-                                        <TextField
-                                            fullWidth
-                                            error={helperTextStatus.fullName}
-                                            label={'Full name'}
-                                            name='fullName'
-                                            onBlur={handleBlur}
-                                            onChange={onChangeFullName}
-                                            value={fullName}
-                                            helperText={helperTextStr.fullName}
-                                            variant='outlined'
-                                        />
+                                        <MuiTextField label='Full name' name='fullName' control={controlEdit} />
                                     </Grid>
                                 </Grid>
                             </Grid>
                         </Grid>
                     </DialogContent>
-                    <DialogActions
-                        sx={{
-                            p: 3
-                        }}
-                    >
+                    <DialogActions sx={{ p: 3 }}>
                         <Button color='secondary' onClick={handleEditDialogClose}>
                             {'Cancel'}
                         </Button>
-                        <Button onClick={handleEditSubmit} variant='contained'>
+                        <Button type='submit' variant='contained'>
                             {'Save'}
                         </Button>
                     </DialogActions>
@@ -507,99 +409,67 @@ function Profile() {
                 >
                     <CloseIcon />
                 </IconButton>
-            </Dialog>
-            <Dialog fullWidth maxWidth='sm' open={openEditPassword} onClose={handleEditPasswordClose}>
-                <DialogTitle
-                    sx={{
-                        p: 3
-                    }}
-                >
-                    <Typography variant='h4' gutterBottom>
-                        {'Edit user password'}
-                    </Typography>
-                </DialogTitle>
-                <form>
-                    <DialogContent
-                        dividers
-                        sx={{
-                            p: 3
-                        }}
-                    >
+            </MuiDialog>
+
+            <MuiDialog
+                title='Change password'
+                subTitle='Your password has not been set, please create a new password'
+                open={openEditPassword}
+                handleClose={handleEditPasswordClose}
+            >
+                <form noValidate onSubmit={handleSubmitPassword(handleEditPasswordSubmit, onError)}>
+                    <DialogContent dividers sx={{ p: 3 }}>
                         <Grid container spacing={3}>
                             <Grid item xs={12}>
                                 <Grid container spacing={3}>
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            fullWidth
-                                            error={helperTextStatus.currentPassword}
-                                            label={'Current Password'}
-                                            name='currentPassword'
-                                            onBlur={handleBlur}
-                                            onChange={onChangeCurrentPassword}
+                                    {currentPassword && (
+                                        <Grid item xs={12} md={12}>
+                                            <TextField
+                                                fullWidth
+                                                error={helperTextStatus.currentPassword}
+                                                label={'Current Password'}
+                                                name='currentPassword'
+                                                onBlur={handleBlur}
+                                                onChange={onChangeCurrentPassword}
+                                                type='password'
+                                                value={currentPassword}
+                                                helperText={helperTextStr.currentPassword}
+                                                variant='outlined'
+                                            />
+                                        </Grid>
+                                    )}
+                                    <Grid item xs={12} md={6}>
+                                        <MuiTextField
                                             type='password'
-                                            value={currentPassword}
-                                            helperText={helperTextStr.currentPassword}
-                                            variant='outlined'
-                                        />
-                                    </Grid>
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            fullWidth
-                                            error={helperTextStatus.password}
-                                            label={'Password'}
+                                            label='New password'
                                             name='password'
-                                            onBlur={handleBlur}
-                                            onChange={onChangePassword}
-                                            type='password'
-                                            value={password}
-                                            helperText={helperTextStr.password}
-                                            variant='outlined'
+                                            control={controlPassword}
+                                            autoComplete='on'
                                         />
                                     </Grid>
-                                    <Grid item xs={12}>
-                                        <TextField
-                                            fullWidth
-                                            error={helperTextStatus.passwordConfirm}
-                                            label={'Confirm password'}
-                                            name='passwordConfirm'
-                                            onBlur={handleBlur}
-                                            onChange={onChangePasswordConfirm}
+                                    <Grid item xs={12} md={6}>
+                                        <MuiTextField
                                             type='password'
-                                            value={passwordConfirm}
-                                            helperText={helperTextStr.passwordConfirm}
-                                            variant='outlined'
+                                            label='Confirm New password'
+                                            name='passwordConfirm'
+                                            control={controlPassword}
+                                            autoComplete='on'
                                         />
                                     </Grid>
                                 </Grid>
                             </Grid>
                         </Grid>
                     </DialogContent>
-                    <DialogActions
-                        sx={{
-                            p: 3
-                        }}
-                    >
+                    <DialogActions sx={{ p: 3 }}>
                         <Button color='secondary' onClick={handleEditPasswordClose}>
                             {'Cancel'}
                         </Button>
-                        <Button onClick={handleEditPasswordSubmit} variant='contained'>
+                        <Button type='submit' variant='contained'>
                             {'Save'}
                         </Button>
                     </DialogActions>
                 </form>
-                <IconButton
-                    aria-label='close'
-                    onClick={handleEditPasswordClose}
-                    sx={{
-                        position: 'absolute',
-                        right: 8,
-                        top: 8,
-                        color: (theme) => theme.palette.grey[500]
-                    }}
-                >
-                    <CloseIcon />
-                </IconButton>
-            </Dialog>
+            </MuiDialog>
         </>
     );
 }

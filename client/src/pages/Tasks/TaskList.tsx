@@ -2,7 +2,6 @@ import { FC, ChangeEvent, useState, useEffect, forwardRef, useContext } from 're
 import PropTypes from 'prop-types';
 import {
     Avatar,
-    Tooltip,
     Box,
     FormControl,
     InputLabel,
@@ -19,7 +18,6 @@ import {
     Select,
     MenuItem,
     Typography,
-    useTheme,
     Grid,
     TextField,
     InputAdornment,
@@ -31,23 +29,28 @@ import {
     styled
 } from '@mui/material';
 import Label from 'src/components/Label';
-import EditTwoToneIcon from '@mui/icons-material/EditTwoTone';
-import DeleteTwoToneIcon from '@mui/icons-material/DeleteTwoTone';
 import SearchTwoToneIcon from '@mui/icons-material/SearchTwoTone';
 import CloseIcon from '@mui/icons-material/Close';
-import VisibilityTwoToneIcon from '@mui/icons-material/VisibilityTwoTone';
 
 import { TaskType, TaskStatusType } from 'src/types/TaskType';
 import TaskApi from 'src/apis/task.api';
 import { AppContext } from 'src/contexts/app.context';
 import TaskView from './TaskView';
-import { notistackSuccess } from 'src/components/Notistack';
+import { notistackError, notistackSuccess } from 'src/components/Notistack';
+import TableActions from '../components/TableActions';
+import TableTypography from 'src/components/TableTypography';
+import MuiDialog from 'src/components/MuiDialog/MuiDialog';
+import MuiTextField from 'src/components/MuiTextField/MuiTextField';
+import { useForm } from 'react-hook-form';
+import { TaskSchema, taskSchema } from 'src/schema/taskSchema';
+import { yupResolver } from '@hookform/resolvers/yup';
+import StatusToggleButton from 'src/components/StatusToggleButton';
 
 interface RecentOrdersTableProps {
     className?: string;
     modelList: TaskType[];
     filterStringChanged: (filterStr: string) => void;
-    EditTaskComplete: () => void;
+    editTaskComplete: () => void;
 }
 
 interface Filters {
@@ -106,6 +109,17 @@ const statusOptions = [
     }
 ];
 
+const statusValues = [
+    {
+        title: 'Completed',
+        value: 'completed'
+    },
+    {
+        title: 'Incomplete',
+        value: 'incomplete'
+    }
+];
+
 const getStatusLabel = (taskStatus: TaskStatusType): JSX.Element => {
     const map = {
         incomplete: {
@@ -148,7 +162,10 @@ const taskCurrentDefault: TaskType = {
     userId: ''
 };
 
-const TaskList: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged, EditTaskComplete }) => {
+type FormData = TaskSchema;
+const editTaskSchema = taskSchema;
+
+const TaskList: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged, editTaskComplete }) => {
     const { profile } = useContext(AppContext);
 
     const [page, setPage] = useState<number>(0);
@@ -162,6 +179,11 @@ const TaskList: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged, 
     const [openEdit, setOpenEdit] = useState<boolean>(false);
     const [openConfirmDelete, setOpenConfirmDelete] = useState(false);
     const [openView, setOpenView] = useState<boolean>(false);
+
+    const handleEditDialogOpen = () => {
+        setOpenEdit(true);
+        console.log(taskCurrent);
+    };
 
     const handleConfirmDelete = (model: TaskType) => {
         setTaskCurrent(model);
@@ -178,7 +200,7 @@ const TaskList: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged, 
         TaskApi.remove(id)
             // eslint-disable-next-line @typescript-eslint/no-unused-vars
             .then((response: any) => {
-                EditTaskComplete();
+                editTaskComplete();
                 notistackSuccess('The task has been removed');
             })
             .catch((e: Error) => {
@@ -186,8 +208,6 @@ const TaskList: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged, 
             });
         setOpenConfirmDelete(false);
     };
-
-    const theme = useTheme();
 
     const handlePageChange = (event: any, newPage: number): void => {
         setPage(newPage);
@@ -227,53 +247,18 @@ const TaskList: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged, 
         filterStringChanged(filterString(filters));
     }, [filters]);
 
-    const handleCreateTaskOpen = () => {
-        setOpenEdit(true);
-    };
-
-    const handleCreateTaskClose = () => {
+    const handleEditTaskClose = () => {
         setOpenEdit(false);
+        reset();
     };
 
     const handleEditTaskOpen = (model: TaskType) => {
-        setTaskCurrent(model);
-        handleCreateTaskOpen();
-    };
-
-    const onChangeStatusTask = (e: any) => {
-        const inputName = e.target.name;
-        setTaskCurrent((prev) => ({
-            ...prev,
-            [inputName]: e.target.value
-        }));
-    };
-
-    const onChangeCurrentTask = (e: ChangeEvent<HTMLInputElement>) => {
-        const inputName = e.target.name;
-        setTaskCurrent((prev) => ({
-            ...prev,
-            [inputName]: e.target.value
-        }));
-    };
-
-    const handleEditSubmit = () => {
-        const id = taskCurrent.id;
-        const data = {
-            title: taskCurrent.title,
-            description: taskCurrent.description,
-            status: taskCurrent.status
-        };
-        TaskApi.update2(id, data)
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            .then((response: any) => {
-                setTaskCurrent(taskCurrentDefault);
-                EditTaskComplete();
-                notistackSuccess('The task has been updated');
-            })
-            .catch((e: Error) => {
-                console.log(e);
-            });
-        handleCreateTaskClose();
+        if (model.id !== undefined) {
+            setTaskCurrent(model);
+            handleEditDialogOpen();
+        } else {
+            notistackError('This user could not be found ');
+        }
     };
 
     const handleViewTaskClose = () => {
@@ -281,7 +266,8 @@ const TaskList: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged, 
         setOpenView(false);
     };
 
-    const handleViewUserOpen = (id: string) => {
+    const handleViewUserOpen = (model: TaskType) => {
+        const id = model.id ? model.id.toString() : '';
         TaskApi.getById(id)
             .then((response: any) => {
                 setTaskCurrent(() => ({
@@ -294,21 +280,52 @@ const TaskList: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged, 
             });
         setOpenView(true);
     };
+
+    const { handleSubmit, control, reset } = useForm<FormData>({
+        mode: 'onSubmit',
+        resolver: yupResolver<FormData>(editTaskSchema),
+        defaultValues: {
+            title: taskCurrent.title,
+            description: taskCurrent.description,
+            status: taskCurrent.status
+        }
+    });
+
+    const handleFormSubmit = (formValues: FormData) => {
+        const id = taskCurrent.id;
+        const data: FormData = {
+            ...formValues
+        };
+
+        TaskApi.update2(id, data)
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            .then(() => {
+                setTaskCurrent(taskCurrentDefault);
+                editTaskComplete();
+                notistackSuccess('The task has been updated');
+            })
+            .catch((e: Error) => {
+                console.log(e);
+            });
+        handleEditTaskClose();
+    };
+
+    const onError = (errors: any) => {
+        console.log('form errors: ', errors);
+    };
+
+    useEffect(() => {
+        reset(taskCurrent);
+    }, [taskCurrent]);
+
     return (
         <>
-            <Card
-                sx={{
-                    p: 1,
-                    mb: 3
-                }}
-            >
+            <Card sx={{ p: 1, mb: 3 }}>
                 <Grid container spacing={2}>
                     <Grid item xs={12} sm={6} md={8}>
                         <Box p={1}>
                             <TextField
-                                sx={{
-                                    m: 0
-                                }}
+                                sx={{ m: 0 }}
                                 InputProps={{
                                     startAdornment: (
                                         <InputAdornment position='start'>
@@ -340,23 +357,21 @@ const TaskList: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged, 
                     </Grid>
                 </Grid>
             </Card>
-            <Card
-                sx={{
-                    p: 1,
-                    mb: 3
-                }}
-            >
+            <Card sx={{ p: 1, mb: 3 }}>
                 <TableContainer>
-                    <Table>
+                    <Table sx={{ width: '100%', tableLayout: 'fixed' }}>
                         <TableHead>
                             <TableRow>
-                                <TableCell>#</TableCell>
-                                <TableCell width='20%'>Task name</TableCell>
+                                <TableCell sx={{ width: '5%' }}>#</TableCell>
+                                <TableCell>Task name</TableCell>
                                 <TableCell>Description</TableCell>
-                                {profile?.role !== 'employee' && <TableCell>UserName</TableCell>}
-
-                                <TableCell align='right'>Status</TableCell>
-                                <TableCell align='right'>Actions</TableCell>
+                                {profile?.role !== 'employee' && <TableCell sx={{ width: '10%' }}>UserName</TableCell>}
+                                <TableCell sx={{ width: '10%' }} align='center'>
+                                    Status
+                                </TableCell>
+                                <TableCell sx={{ width: '15%' }} align='center'>
+                                    Actions
+                                </TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
@@ -364,123 +379,45 @@ const TaskList: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged, 
                                 return (
                                     <TableRow hover key={model.id}>
                                         <TableCell>
-                                            <Typography
-                                                variant='body1'
-                                                fontWeight='bold'
-                                                color='text.primary'
-                                                gutterBottom
-                                                noWrap
-                                            >
-                                                {limit * page + index + 1}
-                                            </Typography>
+                                            <TableTypography>{limit * page + index + 1}</TableTypography>
                                         </TableCell>
                                         <TableCell>
-                                            <Typography
-                                                variant='body1'
-                                                fontWeight='bold'
-                                                color='text.primary'
-                                                gutterBottom
-                                                sx={{
-                                                    overflow: 'hidden',
-                                                    textOverflow: 'ellipsis',
-                                                    display: '-webkit-box',
-                                                    WebkitLineClamp: '2',
-                                                    WebkitBoxOrient: 'vertical'
-                                                }}
-                                            >
-                                                {model.title}
-                                            </Typography>
+                                            <TableTypography>{model.title}</TableTypography>
                                         </TableCell>
                                         <TableCell>
-                                            <Typography
-                                                variant='body1'
-                                                fontWeight='bold'
-                                                color='text.primary'
-                                                gutterBottom
-                                                sx={{
-                                                    overflow: 'hidden',
-                                                    textOverflow: 'ellipsis',
-                                                    display: '-webkit-box',
-                                                    WebkitLineClamp: '2',
-                                                    WebkitBoxOrient: 'vertical'
-                                                }}
-                                            >
-                                                {model.description}
-                                            </Typography>
+                                            <TableTypography>{model.description}</TableTypography>
                                         </TableCell>
                                         {profile?.role !== 'employee' && (
                                             <TableCell>
-                                                <Typography
-                                                    variant='body1'
-                                                    fontWeight='bold'
-                                                    color='text.primary'
-                                                    gutterBottom
-                                                    noWrap
-                                                >
-                                                    {model.user?.userName}
-                                                </Typography>
+                                                <TableTypography>{model.user?.userName}</TableTypography>
                                             </TableCell>
                                         )}
-
-                                        <TableCell align='right'>{getStatusLabel(model.status)}</TableCell>
-                                        <TableCell align='right'>
-                                            <Typography
-                                                variant='body1'
-                                                fontWeight='bold'
-                                                color='text.primary'
-                                                gutterBottom
-                                                noWrap
-                                            >
-                                                <Tooltip title='View user' arrow>
-                                                    <IconButton
-                                                        onClick={() => handleViewUserOpen(model.id.toString())}
-                                                        sx={{
-                                                            '&:hover': {
-                                                                background: theme.colors.warning.lighter
-                                                            },
-                                                            color: theme.palette.warning.main
-                                                        }}
-                                                        color='inherit'
-                                                        size='small'
-                                                    >
-                                                        <VisibilityTwoToneIcon fontSize='small' />
-                                                    </IconButton>
-                                                </Tooltip>
-                                                {(profile?.role === 'admin' || profile?.role === 'employee') && (
-                                                    <>
-                                                        <Tooltip title='Edit Task' arrow>
-                                                            <IconButton
-                                                                onClick={() => handleEditTaskOpen(model)}
-                                                                sx={{
-                                                                    '&:hover': {
-                                                                        background: theme.colors.primary.lighter
-                                                                    },
-                                                                    color: theme.palette.primary.main
-                                                                }}
-                                                                color='inherit'
-                                                                size='small'
-                                                            >
-                                                                <EditTwoToneIcon fontSize='small' />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                        <Tooltip title='Delete Order' arrow>
-                                                            <IconButton
-                                                                onClick={() => handleConfirmDelete(model)}
-                                                                sx={{
-                                                                    '&:hover': {
-                                                                        background: theme.colors.error.lighter
-                                                                    },
-                                                                    color: theme.palette.error.main
-                                                                }}
-                                                                color='inherit'
-                                                                size='small'
-                                                            >
-                                                                <DeleteTwoToneIcon fontSize='small' />
-                                                            </IconButton>
-                                                        </Tooltip>
-                                                    </>
+                                        <TableCell align='center'>{getStatusLabel(model.status)}</TableCell>
+                                        <TableCell align='center'>
+                                            <TableTypography>
+                                                {profile?.role === 'manager' ? (
+                                                    model.id === profile.id ? (
+                                                        <TableActions
+                                                            nameModels='task'
+                                                            handleViewModel={() => handleViewUserOpen(model)}
+                                                            handleEditModel={() => handleEditTaskOpen(model)}
+                                                            handleDeleteModel={() => handleConfirmDelete(model)}
+                                                        />
+                                                    ) : (
+                                                        <TableActions
+                                                            nameModels='task'
+                                                            handleViewModel={() => handleViewUserOpen(model)}
+                                                        />
+                                                    )
+                                                ) : (
+                                                    <TableActions
+                                                        nameModels='task'
+                                                        handleViewModel={() => handleViewUserOpen(model)}
+                                                        handleEditModel={() => handleEditTaskOpen(model)}
+                                                        handleDeleteModel={() => handleConfirmDelete(model)}
+                                                    />
                                                 )}
-                                            </Typography>
+                                            </TableTypography>
                                         </TableCell>
                                     </TableRow>
                                 );
@@ -500,110 +437,48 @@ const TaskList: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged, 
                     />
                 </Box>
             </Card>
-
-            <Dialog fullWidth maxWidth='md' open={openEdit} onClose={handleCreateTaskClose}>
-                <DialogTitle
-                    sx={{
-                        p: 3
-                    }}
-                >
-                    <Typography variant='h4' gutterBottom>
-                        {'Edit task'}
-                    </Typography>
-                </DialogTitle>
-                <form>
-                    <DialogContent
-                        dividers
-                        sx={{
-                            p: 3
-                        }}
-                    >
+            <MuiDialog open={openEdit} handleClose={handleEditTaskClose} title='Edit task'>
+                <form noValidate onSubmit={handleSubmit(handleFormSubmit, onError)}>
+                    <DialogContent dividers sx={{ p: 3 }}>
                         <Grid container spacing={3}>
                             <Grid item xs={12}>
                                 <Grid container spacing={3}>
                                     <Grid item xs={12} md={12}>
-                                        <TextField
-                                            fullWidth
-                                            label={'Title'}
-                                            name='title'
-                                            onChange={onChangeCurrentTask}
-                                            type='text'
-                                            value={taskCurrent.title}
-                                            variant='outlined'
-                                            inputProps={{ maxLength: 255 }}
-                                        />
+                                        <MuiTextField label='Title' name='title' control={control} />
                                     </Grid>
                                     <Grid item xs={12} md={12}>
-                                        <TextField
-                                            fullWidth
-                                            label={'Description'}
+                                        <MuiTextField
+                                            label='Description'
                                             name='description'
-                                            onChange={onChangeCurrentTask}
-                                            type='text'
+                                            control={control}
                                             multiline
                                             minRows={5}
                                             maxRows={10}
-                                            value={taskCurrent.description}
-                                            variant='outlined'
-                                            inputProps={{ maxLength: 300 }}
                                         />
                                     </Grid>
-
+                                    <Grid item xs={12} md={6}></Grid>
                                     <Grid item xs={12} md={6}>
-                                        {taskCurrent.status === 'completed' ? (
-                                            <Button
-                                                name='status'
-                                                onClick={onChangeStatusTask}
-                                                value='incomplete'
-                                                size='large'
-                                                variant='contained'
-                                                color='success'
-                                            >
-                                                Completed
-                                            </Button>
-                                        ) : (
-                                            <Button
-                                                name='status'
-                                                value='completed'
-                                                onClick={onChangeStatusTask}
-                                                size='large'
-                                                variant='contained'
-                                                color='error'
-                                            >
-                                                Incomplete
-                                            </Button>
-                                        )}
+                                        <StatusToggleButton
+                                            name='status'
+                                            control={control}
+                                            statusValues={statusValues}
+                                        />
                                     </Grid>
                                 </Grid>
                             </Grid>
                         </Grid>
                     </DialogContent>
-                    <DialogActions
-                        sx={{
-                            p: 3
-                        }}
-                    >
-                        <Button color='secondary' onClick={handleCreateTaskClose}>
+                    <DialogActions sx={{ p: 3 }}>
+                        <Button color='secondary' onClick={handleEditTaskClose}>
                             {'Cancel'}
                         </Button>
-                        <Button onClick={handleEditSubmit} variant='contained'>
-                            {'Save'}
+                        <Button type='submit' variant='contained'>
+                            {'Edit task'}
                         </Button>
                     </DialogActions>
                 </form>
-                <IconButton
-                    aria-label='close'
-                    onClick={handleCreateTaskClose}
-                    sx={{
-                        position: 'absolute',
-                        right: 8,
-                        top: 8,
-                        color: (theme) => theme.palette.grey[500]
-                    }}
-                >
-                    <CloseIcon />
-                </IconButton>
-            </Dialog>
+            </MuiDialog>
+
             <DialogWrapper
                 open={openConfirmDelete}
                 maxWidth='sm'
@@ -617,35 +492,18 @@ const TaskList: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged, 
                         <CloseIcon />
                     </AvatarError>
 
-                    <Typography
-                        align='center'
-                        sx={{
-                            py: 4,
-                            px: 6
-                        }}
-                        variant='h3'
-                    >
+                    <Typography align='center' sx={{ py: 4, px: 6 }} variant='h3'>
                         {'Are you sure you want to permanently delete this user account'}?
                     </Typography>
 
                     <Box>
-                        <Button
-                            variant='text'
-                            size='large'
-                            sx={{
-                                mx: 1
-                            }}
-                            onClick={closeConfirmDelete}
-                        >
+                        <Button variant='text' size='large' sx={{ mx: 1 }} onClick={closeConfirmDelete}>
                             {'Cancel'}
                         </Button>
                         <ButtonError
                             onClick={handleDeleteCompleted}
                             size='large'
-                            sx={{
-                                mx: 1,
-                                px: 3
-                            }}
+                            sx={{ mx: 1, px: 3 }}
                             variant='contained'
                         >
                             {'Delete'}
@@ -654,28 +512,15 @@ const TaskList: FC<RecentOrdersTableProps> = ({ modelList, filterStringChanged, 
                 </Box>
             </DialogWrapper>
             <Dialog fullWidth maxWidth='sm' open={openView} onClose={handleViewTaskClose}>
-                <DialogTitle
-                    sx={{
-                        p: 3
-                    }}
-                >
+                <DialogTitle sx={{ p: 3 }}>
                     <Typography variant='h4' gutterBottom>
                         {'Task'}
                     </Typography>
                 </DialogTitle>
-                <DialogContent
-                    dividers
-                    sx={{
-                        p: 3
-                    }}
-                >
+                <DialogContent dividers sx={{ p: 3 }}>
                     <TaskView taskCurrent={taskCurrent} />
                 </DialogContent>
-                <DialogActions
-                    sx={{
-                        p: 3
-                    }}
-                >
+                <DialogActions sx={{ p: 3 }}>
                     <Button color='secondary' onClick={handleViewTaskClose}>
                         {'Cancel'}
                     </Button>

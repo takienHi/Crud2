@@ -2,7 +2,7 @@
   "users": [
     {
       "id": 1,
-      "fullName": "Tạ Phong Kiên",
+      "fullName": "Tạ Phong Kiêns",
       "userName": "admin",
       "email": "admin@admin",
       "role": "admin",
@@ -20,7 +20,7 @@
     },
     {
       "id": 3,
-      "fullName": "employee",
+      "fullName": "ha anh",
       "userName": "employee1",
       "email": "employee1@gmail.com",
       "role": "employee",
@@ -56,40 +56,13 @@
       "status": "active"
     },
     {
-      "id": 7,
-      "fullName": "1",
-      "userName": "1",
-      "email": "1",
-      "role": "",
-      "password": "1",
-      "status": "active"
-    },
-    {
-      "id": 8,
-      "fullName": "User2",
-      "userName": "o",
-      "email": "o",
-      "role": "manager",
-      "password": "0",
-      "status": "active"
-    },
-    {
-      "id": 9,
-      "fullName": "9",
-      "userName": "9",
-      "email": "9",
-      "role": "employee",
-      "password": "9",
-      "status": "disabled"
-    },
-    {
       "fullName": "Tạ Phong Kiên",
       "userName": "manager2",
       "email": "manager2@gmail.com",
       "password": "123456",
       "passwordConfirm": "123456",
       "role": "employee",
-      "status": "active",
+      "status": "disabled",
       "id": 10
     },
     {
@@ -113,14 +86,82 @@
       "id": 12
     },
     {
-      "fullName": "Tạ Phong Kiên2",
+      "fullName": "Tạ Phong Kiên",
       "role": "manager",
       "userName": "employee5",
       "email": "employee5@gmail.com",
       "password": "654321",
       "passwordConfirm": "123456",
-      "status": "disabled",
+      "status": "active",
       "id": 13
+    },
+    {
+      "fullName": "Tạ Phong Kiên",
+      "role": "employee",
+      "userName": "admadsasdsadas",
+      "email": "takienss@gmail.com",
+      "password": "123456",
+      "passwordConfirm": "123456",
+      "status": "active",
+      "id": 14
+    },
+    {
+      "fullName": "Tạ Phong Kiên",
+      "role": "manager",
+      "userName": "admin22",
+      "email": "manager22@gmail.com",
+      "password": "123455",
+      "passwordConfirm": "123456",
+      "status": "active",
+      "id": 15
+    },
+    {
+      "fullName": "Anh Tiến",
+      "role": "manager",
+      "userName": "anhtien",
+      "email": "123@gmail.com",
+      "password": "123456",
+      "passwordConfirm": "123456",
+      "status": "disabled",
+      "id": 16
+    },
+    {
+      "fullName": "Tạ Phong Kiên",
+      "userName": "takien2",
+      "email": "takien2@gmail.com",
+      "password": "123456",
+      "passwordConfirm": "123456",
+      "role": "employee",
+      "status": "active",
+      "id": 17
+    },
+    {
+      "fullName": "uuuuuuuuuuuuuuu",
+      "userName": "uuuuuuuuuuuuuuu",
+      "email": "takien2@oo.com",
+      "password": "123456",
+      "passwordConfirm": "123456",
+      "role": "employee",
+      "status": "active",
+      "id": 18
+    },
+    {
+      "fullName": "clap the",
+      "userName": "clapthe",
+      "email": "takirn1234@gmail.com",
+      "role": "employee",
+      "status": "active",
+      "password": "123456",
+      "id": 19
+    },
+    {
+      "fullName": "Kiên Tạ",
+      "userName": "vietnam2",
+      "email": "vietnam9com@gmail.com",
+      "role": "manager",
+      "status": "active",
+      "password": "123456",
+      "id": 20
     }
   ],
   "tasks": [
@@ -189,101 +230,54 @@
     },
     {
       "id": 15,
-      "title": "work",
-      "description": " edit video",
+      "title": "sadas",
+      "description": "asdasd",
       "status": "incomplete",
       "userId": 6
     },
     {
       "id": 16,
       "title": "FormData",
-      "description": "FormDatahow for your familyHost a comedy show for you",
+      "description": "FormDatahow for your familyHost a comedy show for yousssssssssssssssssssssFormDatahow for your familyHost a comedy show for yousssssssssssssssssssssFormDatahow for your familyHost a comedy show for yousssssssssssssssssssssFormDatahow for your familyHost a comedy show for yousssssssssssssssssssss",
       "status": "completed",
       "userId": 3
     },
     {
       "id": 17,
-      "title": "ooooooo",
-      "description": "oooooo",
-      "status": "incomplete",
-      "userId": 8
+      "title": "llllllllllll                                            ",
+      "description": "llllllllllll                                            llllllllllll                                            llllllllllll                                            llllllllllll                                            llllllllllll                                            llllllllllll                                            llllllllllll                                            llllllllllll                                            llllllllllll                                            llllllllllll                                            llllllllllll                                            llllllllllll                                            llllllllllll                                            llllllllllll                                            llllllllllll                                            llllllllllll                                            llllllllllll                                            llllllllllll                                            llllllllllll                                            ",
+      "status": "completed",
+      "userId": 3,
+      "user": {
+        "id": 3,
+        "fullName": "employee",
+        "userName": "employee1",
+        "email": "employee1@gmail.com",
+        "role": "employee",
+        "password": "123456",
+        "status": "active"
+      }
     },
     {
       "id": 18,
-      "title": "trtrtrtrrtrtrt",
-      "description": "dd",
+      "title": "task a",
+      "description": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aliquam eget pharetra metus, quis commodo dolor. Fusce ac lacus lorem. Curabitur rutrum, mi finibus efficitur egestas, tortor nunc fermentum arcu, ultricies dapibus leo elit in ante. Cras lacus eros, suscipit eu malesuada non, posuere at urna. Nam sit amet pulvinar sapien. Fusce ac egestas mi, et egestas diam. Donec tincidunt magna et lacus pulvinar, ac iaculis ante tincidunt. Proin pharetra neque a porttitor blandit. Etiam commodo velit velit, vel cursus lectus tempus vel. Vestibulum rhoncus orci in dui pretium, ut maximus lacus semper. Vivamus ultrices elementum nulla, ac volutpat ligula aliquam at. Nunc sagittis fermentum est, in egestas quam ultricies sed. Proin id dolor at dolor ornare finibus non id nisi.\n\nCurabitur eleifend, erat ac iaculis bibendum, libero lorem congue lorem, vitae rutrum enim eros at justo. Aenean fringilla sed leo nec rutrum. Integer dapibus lorem vel felis ultricies, vitae lobortis risus posuere. Phasellus blandit urna nec tempor euismod. In nulla justo, maximus sed convallis in, accumsan sit amet sem. Pellentesque neque augue, mollis mattis aliquam quis, imperdiet in velit. Curabitur posuere, lacus sit amet rhoncus egestas, ligula justo mattis dui, ut luctus lorem mauris nec risus. In quis lobortis elit. Phasellus dictum, enim id aliquet pharetra, risus ex suscipit sapien, non porttitor elit massa eu turpis.\n\nAliquam pulvinar lorem faucibus odio bibendum, vitae rutrum tellus pharetra. Duis eget rutrum dui. Vivamus faucibus, ante non viverra consequat, libero mauris semper felis, id scelerisque quam felis at tellus. Class aptent taciti sociosqu ad litora torquent per conubia nostra, per inceptos himenaeos. Nunc finibus tellus id rhoncus fringilla. Fusce elementum eleifend eros, vel euismod mauris pulvinar eu. Maecenas laoreet vel nibh eu facilisis.",
       "status": "incomplete",
-      "userId": 8
+      "userId": 19
     },
     {
       "id": 19,
-      "title": "",
-      "description": "",
+      "title": "task b",
+      "description": "Sed vel est tincidunt, varius massa sit amet, fringilla mi. Sed imperdiet orci eget sem posuere finibus. Nulla dignissim dignissim vehicula. Nunc nec quam vitae mi accumsan consequat. Phasellus pulvinar purus nec quam lobortis porta. Quisque vehicula a lorem vel semper. Curabitur congue turpis et libero bibendum efficitur. Vivamus luctus, elit nec faucibus consectetur, odio tortor dignissim erat, et accumsan justo lorem a mauris. Praesent eu tristique velit, vitae tincidunt justo. Donec dignissim est massa, sed tempus neque bibendum a.",
       "status": "incomplete",
-      "userId": 3
+      "userId": 19
     },
     {
       "id": 20,
-      "title": "",
-      "description": "",
+      "title": "task a",
+      "description": "task cc",
       "status": "incomplete",
-      "userId": 3
-    },
-    {
-      "id": 21,
-      "title": "",
-      "description": "",
-      "status": "incomplete",
-      "userId": 3
-    },
-    {
-      "id": 22,
-      "title": "",
-      "description": "",
-      "status": "incomplete",
-      "userId": 3
-    },
-    {
-      "id": 23,
-      "title": "",
-      "description": "",
-      "status": "incomplete",
-      "userId": 3
-    },
-    {
-      "id": 24,
-      "title": "m",
-      "description": "",
-      "status": "incomplete",
-      "userId": 3
-    },
-    {
-      "id": 25,
-      "title": "",
-      "description": "",
-      "status": "incomplete",
-      "userId": 3
-    },
-    {
-      "id": 26,
-      "title": "",
-      "description": "",
-      "status": "incomplete",
-      "userId": 3
-    },
-    {
-      "id": 27,
-      "title": "",
-      "description": "",
-      "status": "incomplete",
-      "userId": 3
-    },
-    {
-      "id": 28,
-      "title": "aqwedededededededededed",
-      "description": "adsssssssssssssss",
-      "status": "incomplete",
-      "userId": 10
+      "userId": 20
     }
   ]
 }

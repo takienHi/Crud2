@@ -1,12 +1,11 @@
 import { Link as RouterLink } from 'react-router-dom';
-import { Box, Card, Link, Tooltip, Typography, Container, Alert, styled } from '@mui/material';
+import { Box, Card, Link, Typography, Container, styled } from '@mui/material';
 
-// import { useTranslation } from 'react-i18next';
 import Logo from 'src/components/LogoSign';
 
 import { Helmet } from 'react-helmet-async';
 import LoginForm from './LoginForm';
-import LoginForm2 from './LoginForm2';
+import GoogleLoginButton from 'src/components/GoogleLoginButton/GoogleLoginButton';
 
 const MainContent = styled(Box)(
     () => `
@@ -36,36 +35,19 @@ function Login() {
                 <TopWrapper>
                     <Container maxWidth='sm'>
                         <Logo />
-                        <Card
-                            sx={{
-                                mt: 3,
-                                px: 4,
-                                pt: 5,
-                                pb: 3
-                            }}
-                        >
+                        <Card sx={{ mt: 3, px: 4, pt: 5, pb: 3 }}>
                             <Box>
-                                <Typography
-                                    variant='h2'
-                                    sx={{
-                                        mb: 1
-                                    }}
-                                >
+                                <Typography variant='h2' sx={{ mb: 1 }}>
                                     {'Sign in'}
                                 </Typography>
-                                <Typography
-                                    variant='h4'
-                                    color='text.secondary'
-                                    fontWeight='normal'
-                                    sx={{
-                                        mb: 3
-                                    }}
-                                >
+                                <Typography variant='h4' color='text.secondary' fontWeight='normal' sx={{ mb: 3 }}>
                                     {'Fill in the fields below to sign into your account.'}
                                 </Typography>
                             </Box>
-                            {/* <LoginForm /> */}
-                            <LoginForm2 />
+                            <LoginForm />
+                            <Box mt={1}>
+                                <GoogleLoginButton />
+                            </Box>
                             <Box my={4}>
                                 <Typography component='span' variant='subtitle2' color='text.primary' fontWeight='bold'>
                                     {'Don’t have an account, yet?'}

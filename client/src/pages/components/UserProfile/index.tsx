@@ -49,12 +49,7 @@ function Profile() {
     const theme = useTheme();
 
     return (
-        <Card
-            sx={{
-                position: 'relative',
-                p: 3
-            }}
-        >
+        <Card sx={{ position: 'relative', p: 3 }}>
             <CardActions>
                 <IconButton size='small' color='primary'>
                     <MoreHorizTwoToneIcon />
@@ -144,17 +139,8 @@ function Profile() {
                 }
                 .
             </Typography>
-            <Divider
-                sx={{
-                    mt: 3
-                }}
-            />
-            <List
-                disablePadding
-                sx={{
-                    my: 1.5
-                }}
-            >
+            <Divider sx={{ mt: 3 }} />
+            <List disablePadding sx={{ my: 1.5 }}>
                 <ListItem disableGutters>
                     <ListItemText
                         primaryTypographyProps={{
@@ -183,11 +169,7 @@ function Profile() {
                     <Typography variant='subtitle1'>San Francisco, USA</Typography>
                 </ListItem>
             </List>
-            <Divider
-                sx={{
-                    mb: 3
-                }}
-            />
+            <Divider sx={{ mb: 3 }} />
             <Button
                 fullWidth
                 variant='text'

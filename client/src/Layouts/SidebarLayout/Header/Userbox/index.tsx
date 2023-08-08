@@ -146,28 +146,15 @@ function HeaderUserbox() {
                 </Box>
             </Popover>
             <Dialog fullWidth maxWidth='sm' open={openView} onClose={handleViewUserClose}>
-                <DialogTitle
-                    sx={{
-                        p: 3
-                    }}
-                >
+                <DialogTitle sx={{ p: 3 }}>
                     <Typography variant='h4' gutterBottom>
                         {'Profile'}
                     </Typography>
                 </DialogTitle>
-                <DialogContent
-                    dividers
-                    sx={{
-                        p: 3
-                    }}
-                >
+                <DialogContent dividers sx={{ p: 3 }}>
                     <UserProfile />
                 </DialogContent>
-                <DialogActions
-                    sx={{
-                        p: 3
-                    }}
-                >
+                <DialogActions sx={{ p: 3 }}>
                     <Button color='secondary' onClick={handleViewUserClose}>
                         {'Cancel'}
                     </Button>

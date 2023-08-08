@@ -57,12 +57,7 @@ function TaskView({ taskCurrent }: TaskViewProps) {
     return (
         <>
             <Box mb={2} display='flex' alignItems='center'>
-                <Box
-                    sx={{
-                        width: '100%'
-                    }}
-                    ml={1.5}
-                >
+                <Box sx={{ width: '100%' }} ml={1.5}>
                     <Link
                         href='#'
                         color='text.primary'
@@ -82,17 +77,8 @@ function TaskView({ taskCurrent }: TaskViewProps) {
                 </Box>
             </Box>
             <Typography variant='subtitle2'>{taskCurrent.description}.</Typography>
-            <Divider
-                sx={{
-                    mt: 3
-                }}
-            />
-            <List
-                disablePadding
-                sx={{
-                    my: 1.5
-                }}
-            >
+            <Divider sx={{ mt: 3 }} />
+            <List disablePadding sx={{ my: 1.5 }}>
                 <ListItem disableGutters>
                     <ListItemText
                         primaryTypographyProps={{

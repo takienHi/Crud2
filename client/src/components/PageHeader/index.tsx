@@ -2,8 +2,8 @@ import { Grid, Typography, Button } from '@mui/material';
 import AddTwoToneIcon from '@mui/icons-material/AddTwoTone';
 
 type PageHeaderProps = {
-    handleAction: () => void;
-    buttonTitle: string;
+    handleAction?: () => void;
+    buttonTitle?: string;
     title: string;
     subTitle: string;
 };
@@ -18,18 +18,20 @@ function PageHeader({ handleAction, buttonTitle, title, subTitle }: PageHeaderPr
                     </Typography>
                     <Typography variant='subtitle2'>{subTitle}</Typography>
                 </Grid>
-                <Grid item>
-                    <Button
-                        sx={{
-                            mt: { xs: 2, sm: 0 }
-                        }}
-                        onClick={handleAction}
-                        variant='contained'
-                        startIcon={<AddTwoToneIcon fontSize='small' />}
-                    >
-                        {buttonTitle}
-                    </Button>
-                </Grid>
+                {handleAction && buttonTitle && (
+                    <Grid item>
+                        <Button
+                            sx={{
+                                mt: { xs: 2, sm: 0 }
+                            }}
+                            onClick={handleAction}
+                            variant='contained'
+                            startIcon={<AddTwoToneIcon fontSize='small' />}
+                        >
+                            {buttonTitle}
+                        </Button>
+                    </Grid>
+                )}
             </Grid>
         </>
     );

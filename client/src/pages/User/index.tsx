@@ -7,7 +7,6 @@ import Footer from 'src/components/Footer';
 import { useContext, useEffect, useState } from 'react';
 import { UserType } from 'src/types/UserType';
 import UserApi from 'src/apis/user.api';
-import UserList from './UserList';
 import UserList2 from './UserList2';
 
 import PageHeader from 'src/components/PageHeader';
@@ -26,7 +25,7 @@ type FormData = CreateUserSchema;
 function Users() {
     const { profile } = useContext(AppContext);
 
-    const [openCreateDialog, setOpenCreateDialog] = useState(false);
+    const [openCreateDialog, setCreateDialog] = useState(false);
     const [users, setUsers] = useState<UserType[]>([]);
     const [filterString, setFilterString] = useState<string>('');
 
@@ -34,15 +33,15 @@ function Users() {
 
     const createDialogClose = () => {
         reset();
-        setOpenCreateDialog(false);
+        setCreateDialog(false);
     };
 
     const createDialogOpen = () => {
-        setOpenCreateDialog(true);
+        setCreateDialog(true);
     };
 
     const addUserComplete = () => {
-        // getUserList();
+        getUserList();
         createDialogClose();
     };
 
@@ -106,11 +105,6 @@ function Users() {
             <Container maxWidth='lg'>
                 <Grid container direction='row' justifyContent='center' alignItems='stretch' spacing={3}>
                     <Grid item xs={12}>
-                        {/* <UserList
-                            modelList={users}
-                            filterStringChanged={filterStringChanged}
-                            editUserComplete={editUserComplete}
-                        /> */}
                         <UserList2
                             modelList={users}
                             filterStringChanged={filterStringChanged}
@@ -170,11 +164,7 @@ function Users() {
                             </Grid>
                         </Grid>
                     </DialogContent>
-                    <DialogActions
-                        sx={{
-                            p: 3
-                        }}
-                    >
+                    <DialogActions sx={{ p: 3 }}>
                         <Button color='secondary' onClick={createDialogClose}>
                             {'Cancel'}
                         </Button>
